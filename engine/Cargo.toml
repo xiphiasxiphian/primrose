@@ -4,3 +4,11 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+wgpu     = "0.20"
+bytemuck = { version = "1", features = ["derive"] }
+image    = { version = "0.25", default-features = false, features = ["png"] }
+glam     = { version = "0.28", features = ["bytemuck"] }
+kira     = "0.9"
+log      = "0.4"
+winit    = "0.30"
+pollster = "0.3"
