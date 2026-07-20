@@ -1,5 +1,7 @@
 use strum::EnumCount;
 
+use winit::event::MouseButton as NativeMouseButton;
+
 #[derive(Debug, EnumCount)]
 pub enum MouseButton
 {
@@ -8,17 +10,17 @@ pub enum MouseButton
     Right,
 }
 
-impl TryFrom<i16> for MouseButton
+impl TryFrom<NativeMouseButton> for MouseButton
 {
     type Error = ();
 
-    fn try_from(value: i16) -> Result<Self, Self::Error>
+    fn try_from(value: NativeMouseButton) -> Result<Self, Self::Error>
     {
         match value
         {
-            0 => Ok(Self::Left),
-            1 => Ok(Self::Middle),
-            2 => Ok(Self::Right),
+            NativeMouseButton::Left => Ok(Self::Left),
+            NativeMouseButton::Middle => Ok(Self::Middle),
+            NativeMouseButton::Right => Ok(Self::Right),
             _ => Err(()),
         }
     }

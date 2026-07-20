@@ -1,4 +1,5 @@
 use strum::EnumCount;
+use winit::keyboard::KeyCode;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumCount)]
 pub enum Key
@@ -97,101 +98,44 @@ pub enum Key
     NumpadDivide,
 }
 
-impl TryFrom<&str> for Key
-{
+impl TryFrom<KeyCode> for Key {
     type Error = ();
 
-    fn try_from(code: &str) -> Result<Self, Self::Error>
-    {
-        match code
-        {
-            "KeyA" => Ok(Key::A),
-            "KeyB" => Ok(Key::B),
-            "KeyC" => Ok(Key::C),
-            "KeyD" => Ok(Key::D),
-            "KeyE" => Ok(Key::E),
-            "KeyF" => Ok(Key::F),
-            "KeyG" => Ok(Key::G),
-            "KeyH" => Ok(Key::H),
-            "KeyI" => Ok(Key::I),
-            "KeyJ" => Ok(Key::J),
-            "KeyK" => Ok(Key::K),
-            "KeyL" => Ok(Key::L),
-            "KeyM" => Ok(Key::M),
-            "KeyN" => Ok(Key::N),
-            "KeyO" => Ok(Key::O),
-            "KeyP" => Ok(Key::P),
-            "KeyQ" => Ok(Key::Q),
-            "KeyR" => Ok(Key::R),
-            "KeyS" => Ok(Key::S),
-            "KeyT" => Ok(Key::T),
-            "KeyU" => Ok(Key::U),
-            "KeyV" => Ok(Key::V),
-            "KeyW" => Ok(Key::W),
-            "KeyX" => Ok(Key::X),
-            "KeyY" => Ok(Key::Y),
-            "KeyZ" => Ok(Key::Z),
+    fn try_from(code: KeyCode) -> Result<Self, Self::Error> {
+        use KeyCode as W;
+        match code {
+            W::KeyA => Ok(Key::A), W::KeyB => Ok(Key::B), W::KeyC => Ok(Key::C),
+            W::KeyD => Ok(Key::D), W::KeyE => Ok(Key::E), W::KeyF => Ok(Key::F),
+            W::KeyG => Ok(Key::G), W::KeyH => Ok(Key::H), W::KeyI => Ok(Key::I),
+            W::KeyJ => Ok(Key::J), W::KeyK => Ok(Key::K), W::KeyL => Ok(Key::L),
+            W::KeyM => Ok(Key::M), W::KeyN => Ok(Key::N), W::KeyO => Ok(Key::O),
+            W::KeyP => Ok(Key::P), W::KeyQ => Ok(Key::Q), W::KeyR => Ok(Key::R),
+            W::KeyS => Ok(Key::S), W::KeyT => Ok(Key::T), W::KeyU => Ok(Key::U),
+            W::KeyV => Ok(Key::V), W::KeyW => Ok(Key::W), W::KeyX => Ok(Key::X),
+            W::KeyY => Ok(Key::Y), W::KeyZ => Ok(Key::Z),
 
-            "Digit0" => Ok(Key::N0),
-            "Digit1" => Ok(Key::N1),
-            "Digit2" => Ok(Key::N2),
-            "Digit3" => Ok(Key::N3),
-            "Digit4" => Ok(Key::N4),
-            "Digit5" => Ok(Key::N5),
-            "Digit6" => Ok(Key::N6),
-            "Digit7" => Ok(Key::N7),
-            "Digit8" => Ok(Key::N8),
-            "Digit9" => Ok(Key::N9),
+            W::Digit0 => Ok(Key::N0), W::Digit1 => Ok(Key::N1),
+            W::Digit2 => Ok(Key::N2), W::Digit3 => Ok(Key::N3),
+            W::Digit4 => Ok(Key::N4), W::Digit5 => Ok(Key::N5),
+            W::Digit6 => Ok(Key::N6), W::Digit7 => Ok(Key::N7),
+            W::Digit8 => Ok(Key::N8), W::Digit9 => Ok(Key::N9),
 
-            "ArrowUp" => Ok(Key::ArrowUp),
-            "ArrowDown" => Ok(Key::ArrowDown),
-            "ArrowLeft" => Ok(Key::ArrowLeft),
-            "ArrowRight" => Ok(Key::ArrowRight),
+            W::ArrowUp    => Ok(Key::ArrowUp),    W::ArrowDown  => Ok(Key::ArrowDown),
+            W::ArrowLeft  => Ok(Key::ArrowLeft),  W::ArrowRight => Ok(Key::ArrowRight),
 
-            "ShiftLeft" => Ok(Key::ShiftLeft),
-            "ShiftRight" => Ok(Key::ShiftRight),
-            "ControlLeft" => Ok(Key::ControlLeft),
-            "ControlRight" => Ok(Key::ControlRight),
-            "AltLeft" => Ok(Key::AltLeft),
-            "AltRight" => Ok(Key::AltRight),
+            W::ShiftLeft   => Ok(Key::ShiftLeft),   W::ShiftRight   => Ok(Key::ShiftRight),
+            W::ControlLeft => Ok(Key::ControlLeft), W::ControlRight => Ok(Key::ControlRight),
 
-            "Space" => Ok(Key::Space),
-            "Enter" => Ok(Key::Enter),
-            "Escape" => Ok(Key::Escape),
-            "Backspace" => Ok(Key::Backspace),
-            "Tab" => Ok(Key::Tab),
-            "CapsLock" => Ok(Key::CapsLock),
+            W::Space     => Ok(Key::Space),  W::Enter     => Ok(Key::Enter),
+            W::Escape    => Ok(Key::Escape), W::Backspace => Ok(Key::Backspace),
+            W::Tab       => Ok(Key::Tab),    W::CapsLock  => Ok(Key::CapsLock),
 
-            "F1" => Ok(Key::F1),
-            "F2" => Ok(Key::F2),
-            "F3" => Ok(Key::F3),
-            "F4" => Ok(Key::F4),
-            "F5" => Ok(Key::F5),
-            "F6" => Ok(Key::F6),
-            "F7" => Ok(Key::F7),
-            "F8" => Ok(Key::F8),
-            "F9" => Ok(Key::F9),
-            "F10" => Ok(Key::F10),
-            "F11" => Ok(Key::F11),
-            "F12" => Ok(Key::F12),
+            W::F1  => Ok(Key::F1),  W::F2  => Ok(Key::F2),  W::F3  => Ok(Key::F3),
+            W::F4  => Ok(Key::F4),  W::F5  => Ok(Key::F5),  W::F6  => Ok(Key::F6),
+            W::F7  => Ok(Key::F7),  W::F8  => Ok(Key::F8),  W::F9  => Ok(Key::F9),
+            W::F10 => Ok(Key::F10), W::F11 => Ok(Key::F11), W::F12 => Ok(Key::F12),
 
-            "Numpad0" => Ok(Key::Numpad0),
-            "Numpad1" => Ok(Key::Numpad1),
-            "Numpad2" => Ok(Key::Numpad2),
-            "Numpad3" => Ok(Key::Numpad3),
-            "Numpad4" => Ok(Key::Numpad4),
-            "Numpad5" => Ok(Key::Numpad5),
-            "Numpad6" => Ok(Key::Numpad6),
-            "Numpad7" => Ok(Key::Numpad7),
-            "Numpad8" => Ok(Key::Numpad8),
-            "Numpad9" => Ok(Key::Numpad9),
-            "NumpadEnter" => Ok(Key::NumpadEnter),
-            "NumpadAdd" => Ok(Key::NumpadAdd),
-            "NumpadSubtract" => Ok(Key::NumpadSubtract),
-            "NumpadMultiply" => Ok(Key::NumpadMultiply),
-            "NumpadDivide" => Ok(Key::NumpadDivide),
-
-            _ => Err(()), // unknown key, silently ignored
+            _ => Err(())
         }
     }
 }

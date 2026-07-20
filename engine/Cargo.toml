@@ -7,8 +7,10 @@ edition = "2024"
 wgpu     = "0.20"
 bytemuck = { version = "1", features = ["derive"] }
 image    = { version = "0.25", default-features = false, features = ["png"] }
-glam     = { version = "0.28", features = ["bytemuck"] }
+glam = { version = "0.33.2", features = ["bytemuck"] }
 kira     = "0.9"
 log      = "0.4"
 winit    = "0.30"
 pollster = "0.3"
+strum = { version = "0.28.0", features = ["derive"] }
+thiserror = "2.0.19"

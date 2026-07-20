@@ -1,34 +1,23 @@
-use web_sys::{Performance, Window};
+use std::time::Instant;
 
 pub struct Clock
 {
-    performance: Performance,
-    last: f64,
-    delta: f64,
+    last: Instant
 }
 
 impl Clock
 {
-    pub fn new(window: &Window) -> Option<Self>
+    pub fn new() -> Self
     {
-        let performance = window.performance()?;
-        let now = performance.now();
-
-        Some(Self {
-            performance: performance,
-            last: now,
-            delta: 0.0,
-        })
+        Self { last: Instant::now() }
     }
 
     pub fn tick(&mut self) -> f64
     {
-        let current = self.performance.now();
-        self.delta = (current - self.last) / 1000.0; // ms per second
-        self.last = current;
+        let now = Instant::now();
+        let delta = now.duration_since(self.last).as_secs_f64();
 
-        return self.delta;
+        self.last = now;
+        delta
     }
-
-    pub fn delta(&self) -> f64 { self.delta }
 }

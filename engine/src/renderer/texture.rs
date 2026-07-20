@@ -1,3 +1,6 @@
+#[cfg(not(target_arch = "wasm32"))]
+use std::path::Path;
+
 use image::{DynamicImage, GenericImageView, ImageError};
 use wgpu::{
     BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, BindingResource, Device, Extent3d,

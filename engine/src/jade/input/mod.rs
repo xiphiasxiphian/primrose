@@ -5,10 +5,11 @@ use std::{cell::RefCell, rc::Rc};
 
 use log::info;
 use strum::EnumCount;
-use wasm_bindgen::{JsCast, convert::FromWasmAbi, prelude::Closure};
-use web_sys::{Event, EventTarget, KeyboardEvent, MouseEvent, Window};
+use winit::{dpi::{PhysicalPosition, Position}, event::{ElementState, KeyEvent}, keyboard::PhysicalKey};
 
 use crate::jade::input::{key::Key, mouse::MouseButton};
+
+pub type MousePos = PhysicalPosition<f64>;
 
 #[derive(Debug)]
 pub struct InputState
@@ -16,8 +17,8 @@ pub struct InputState
     keys_held: [bool; Key::COUNT],
     keys_down: [bool; Key::COUNT],
     keys_up: [bool; Key::COUNT],
-    mouse_pos: (i32, i32),
-    mouse_delta: (i32, i32),
+    mouse_pos: MousePos,
+    mouse_delta: MousePos,
     mouse_buttons: [bool; MouseButton::COUNT],
     mouse_down: [bool; MouseButton::COUNT],
     mouse_up: [bool; MouseButton::COUNT],
@@ -31,8 +32,8 @@ impl InputState
             keys_held: [false; Key::COUNT],
             keys_down: [false; Key::COUNT],
             keys_up: [false; Key::COUNT],
-            mouse_pos: (0, 0),
-            mouse_delta: (0, 0),
+            mouse_pos: MousePos::default(),
+            mouse_delta: MousePos::default(),
             mouse_buttons: [false; MouseButton::COUNT],
             mouse_down: [false; MouseButton::COUNT],
             mouse_up: [false; MouseButton::COUNT],
@@ -41,7 +42,7 @@ impl InputState
 
     pub fn flush(&mut self)
     {
-        self.mouse_delta = (0, 0);
+        self.mouse_delta = MousePos::default();
 
         self.keys_up = [false; Key::COUNT];
         self.keys_down = [false; Key::COUNT];
@@ -49,114 +50,38 @@ impl InputState
         self.mouse_up = [false; MouseButton::COUNT];
     }
 
-    pub fn attach_listeners(state: Rc<RefCell<Self>>, window: &mut Window, target: &EventTarget)
+    pub fn handle_key_event(&mut self, key_event: KeyEvent)
     {
-        // keydown listener
-        Self::attach_listener(
-            state.clone(),
-            &window,
-            |st| {
-                move |e: KeyboardEvent| {
-                    // ignore any unknown keys
-                    if let Ok(key) = Key::try_from(e.code().as_str())
-                    {
-                        let mut s = st.borrow_mut();
-                        s.keys_down[key as usize] = true;
-                        s.keys_held[key as usize] = true;
-                    }
-                }
-            },
-            "keydown",
-        );
+        let PhysicalKey::Code(code) = key_event.physical_key else { return };
+        let Ok(key) = Key::try_from(code) else { return };
 
-        // keyup listener
-        Self::attach_listener(
-            state.clone(),
-            &window,
-            |st| {
-                move |e: KeyboardEvent| {
-                    if let Ok(key) = Key::try_from(e.code().as_str())
-                    {
-                        let mut s = st.borrow_mut();
-                        s.keys_up[key as usize] = true;
-                        s.keys_held[key as usize] = false;
-                    }
-                }
-            },
-            "keyup",
-        );
-
-        // mousemove
-        Self::attach_listener(
-            state.clone(),
-            &window,
-            |st| {
-                move |e: MouseEvent| {
-                    let mut s = st.borrow_mut();
-                    s.mouse_delta = (e.movement_x(), e.movement_y());
-                    s.mouse_pos = (e.offset_x(), e.offset_y());
-                }
-            },
-            "mousemove",
-        );
-
-        // mousedown
-        Self::attach_listener(
-            state.clone(),
-            &target,
-            |st| {
-                move |e: MouseEvent| {
-                    // button: 0=left, 1=middle, 2=right
-
-                    if let Ok(button) = MouseButton::try_from(e.button())
-                    {
-                        let mut s = st.borrow_mut();
-                        let index = button as usize;
-                        s.mouse_buttons[index] = true;
-                        s.mouse_down[index] = true;
-                    }
-                }
-            },
-            "mousedown",
-        );
-
-        // mouseup
-        Self::attach_listener(
-            state.clone(),
-            &target,
-            |st| {
-                move |e: MouseEvent| {
-                    // button: 0=left, 1=middle, 2=right
-
-                    if let Ok(button) = MouseButton::try_from(e.button())
-                    {
-                        let mut s = st.borrow_mut();
-                        let index = button as usize;
-                        s.mouse_buttons[index] = false;
-                        s.mouse_up[index] = true;
-                    }
-                }
-            },
-            "mouseup",
-        );
+        match key_event.state
+        {
+            ElementState::Pressed => {
+                self.keys_down[key as usize] = true;
+                self.keys_held[key as usize] = true;
+            }
+            ElementState::Released => {
+                self.keys_up[key as usize] = true;
+                self.keys_held[key as usize] = false;
+            }
+        }
     }
 
-    fn attach_listener<A, T, F, F2>(state: Rc<RefCell<Self>>, attachment_target: A, callback: F, listener: &str)
-    where
-        T: FromWasmAbi + AsRef<Event>,
-        F2: FnMut(T) + 'static,
-        F: FnOnce(Rc<RefCell<Self>>) -> F2,
-        A: AsRef<EventTarget>,
+    pub fn handle_cursor_event(&mut self, position: PhysicalPosition<f64>)
     {
-        let cb = Closure::<dyn FnMut(T)>::new(callback(state));
+        self.mouse_pos = position;
+    }
 
-        attachment_target
-            .as_ref()
-            .add_event_listener_with_callback(listener, cb.as_ref().unchecked_ref())
-            .expect(format!("Failed to attach \'{}\' listener", listener).as_ref());
+    pub fn handle_mouse_event(&mut self, state: ElementState, button: winit::event::MouseButton)
+    {
+        let Ok(btn) = MouseButton::try_from(button) else { return };
 
-        info!("Attached \'{}\' listener", listener);
-        cb.forget()
+        match state
+        {
+            ElementState::Pressed => self.mouse_buttons[btn as usize] = true,
+            ElementState::Released => self.mouse_buttons[btn as usize] = false,
+        }
     }
 
     pub fn is_key_down(&self, key: Key) -> bool { self.keys_down[key as usize] }
@@ -169,7 +94,7 @@ impl InputState
 
     pub fn is_mouse_button_up(&self, button: MouseButton) -> bool { self.mouse_up[button as usize] }
 
-    pub fn mouse_pos(&self) -> (i32, i32) { self.mouse_pos }
+    pub fn mouse_pos(&self) -> MousePos { self.mouse_pos }
 
-    pub fn mouse_delta(&self) -> (i32, i32) { self.mouse_delta }
+    pub fn mouse_delta(&self) -> MousePos { self.mouse_delta }
 }

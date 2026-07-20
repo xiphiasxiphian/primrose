@@ -82,13 +82,13 @@ impl Renderer
             layout: Some(&pipeline_layout),
             vertex: VertexState {
                 module: &shader,
-                entry_point: Some("vs_main"),
+                entry_point: "vs_main",
                 buffers: &[Vertex::layout()],
                 compilation_options: Default::default(),
             },
             fragment: Some(FragmentState {
                 module: &shader,
-                entry_point: Some("fs_main"),
+                entry_point: "fs_main",
                 compilation_options: Default::default(),
                 targets: &[Some(wgpu::ColorTargetState {
                     format: surface_format,
@@ -117,7 +117,6 @@ impl Renderer
             depth_stencil: None,
             multisample: MultisampleState::default(),
             multiview: None,
-            cache: None,
         });
 
         Self {
