@@ -16,8 +16,8 @@ pub struct TextureBatch
 
 impl TextureBatch
 {
-    const MAX_VERTICES: usize = 4 * 1024;
-    const MAX_INDICES: usize = 6 * 1024;
+    const MAX_VERTICES: usize = 8 * 1024;
+    const MAX_INDICES: usize = 12 * 1024;
 
     pub fn new(device: &Device) -> Self
     {
