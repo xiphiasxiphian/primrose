@@ -5,7 +5,11 @@ use std::{cell::RefCell, rc::Rc};
 
 use log::info;
 use strum::EnumCount;
-use winit::{dpi::{PhysicalPosition, Position}, event::{ElementState, KeyEvent}, keyboard::PhysicalKey};
+use winit::{
+    dpi::{PhysicalPosition, Position},
+    event::{ElementState, KeyEvent},
+    keyboard::PhysicalKey,
+};
 
 use crate::jade::input::{key::Key, mouse::MouseButton};
 
@@ -52,30 +56,41 @@ impl InputState
 
     pub fn handle_key_event(&mut self, key_event: KeyEvent)
     {
-        let PhysicalKey::Code(code) = key_event.physical_key else { return };
-        let Ok(key) = Key::try_from(code) else { return };
+        let PhysicalKey::Code(code) = key_event.physical_key
+        else
+        {
+            return;
+        };
+        let Ok(key) = Key::try_from(code)
+        else
+        {
+            return;
+        };
 
         match key_event.state
         {
-            ElementState::Pressed => {
+            ElementState::Pressed =>
+            {
                 self.keys_down[key as usize] = true;
                 self.keys_held[key as usize] = true;
             }
-            ElementState::Released => {
+            ElementState::Released =>
+            {
                 self.keys_up[key as usize] = true;
                 self.keys_held[key as usize] = false;
             }
         }
     }
 
-    pub fn handle_cursor_event(&mut self, position: PhysicalPosition<f64>)
-    {
-        self.mouse_pos = position;
-    }
+    pub fn handle_cursor_event(&mut self, position: PhysicalPosition<f64>) { self.mouse_pos = position; }
 
     pub fn handle_mouse_event(&mut self, state: ElementState, button: winit::event::MouseButton)
     {
-        let Ok(btn) = MouseButton::try_from(button) else { return };
+        let Ok(btn) = MouseButton::try_from(button)
+        else
+        {
+            return;
+        };
 
         match state
         {

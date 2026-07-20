@@ -1,5 +1,4 @@
 use strum::EnumCount;
-
 use winit::event::MouseButton as NativeMouseButton;
 
 #[derive(Debug, EnumCount)]

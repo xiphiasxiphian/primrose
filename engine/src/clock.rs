@@ -2,15 +2,12 @@ use std::time::Instant;
 
 pub struct Clock
 {
-    last: Instant
+    last: Instant,
 }
 
 impl Clock
 {
-    pub fn new() -> Self
-    {
-        Self { last: Instant::now() }
-    }
+    pub fn new() -> Self { Self { last: Instant::now() } }
 
     pub fn tick(&mut self) -> f64
     {

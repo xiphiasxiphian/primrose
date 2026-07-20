@@ -45,20 +45,27 @@ impl BufferPool
 
     pub fn write(&mut self, queue: &Queue, vertices: &[Vertex], indices: &[u32]) -> Option<BufferSlice>
     {
-        if vertices.len() > self.vertex_capacity || indices.len() > self.index_capacity
+        let vb = bytemuck::cast_slice(vertices);
+        let ib = bytemuck::cast_slice(indices);
+
+        if vb.len() > self.vertex_capacity
         {
-            log::warn!(
-                "BufferPool overflow: {} vertices (cap {}), {} indices (cap {})",
-                vertices.len(),
-                self.vertex_capacity,
-                indices.len(),
-                self.index_capacity,
+            log::error!(
+                "Vertex buffer overflow: {} bytes > {} cap",
+                vb.len(),
+                self.vertex_capacity
             );
             return None;
         }
-
-        let vb = bytemuck::cast_slice(vertices);
-        let ib = bytemuck::cast_slice(indices);
+        if ib.len() > self.index_capacity
+        {
+            log::error!(
+                "Index buffer overflow: {} bytes > {} cap",
+                ib.len(),
+                self.index_capacity
+            );
+            return None;
+        }
 
         queue.write_buffer(&self.vertex_buffer, 0, vb);
         queue.write_buffer(&self.index_buffer, 0, ib);
@@ -77,7 +84,9 @@ impl BufferPool
 
     pub fn fits(&self, vertex_count: usize, index_count: usize) -> bool
     {
-        vertex_count <= self.vertex_capacity && index_count <= self.index_capacity
+        let vb = vertex_count * size_of::<Vertex>();
+        let ib = index_count * size_of::<u32>();
+        vb <= self.vertex_capacity && ib <= self.index_capacity
     }
 
     pub fn vertex_buffer(&self) -> wgpu::BufferSlice<'_> { self.vertex_buffer.slice(..) }

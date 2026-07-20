@@ -1,6 +1,3 @@
 use engine::window::Window;
 
-fn main()
-{
-    Window::run();
-}
+fn main() { Window::run(); }

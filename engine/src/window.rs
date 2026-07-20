@@ -2,12 +2,20 @@ use std::{cell::RefCell, rc::Rc, sync::Arc};
 
 use log::{info, warn};
 use wgpu::{
-    Device, DeviceDescriptor, Features, Instance, Limits, PowerPreference, Queue, RequestAdapterOptions, Surface, SurfaceConfiguration, TextureUsages,
+    Device, DeviceDescriptor, Features, Instance, Limits, PowerPreference, Queue, RequestAdapterOptions, Surface,
+    SurfaceConfiguration, TextureUsages,
 };
-use winit::{application::ApplicationHandler, dpi::LogicalSize, event::WindowEvent, event_loop::{ActiveEventLoop, EventLoop}, window::{Window as NativeWindow, WindowAttributes, WindowId}};
+use winit::{
+    application::ApplicationHandler,
+    dpi::LogicalSize,
+    event::WindowEvent,
+    event_loop::{ActiveEventLoop, EventLoop},
+    window::{Window as NativeWindow, WindowAttributes, WindowId},
+};
 
 use crate::{
-    clock::Clock, jade::{
+    clock::Clock,
+    jade::{
         audio::SoundHandler,
         ecs::{
             components::{basic_controller::PlayerController, camera::camera_lock::CameraLock},
@@ -16,7 +24,12 @@ use crate::{
         },
         input::InputState,
         scene::{ComponentContextIn, Scene},
-    }, renderer::Renderer, util::assets::{self, assetpool::{Asset, AssetPool}},
+    },
+    renderer::Renderer,
+    util::assets::{
+        self,
+        assetpool::{Asset, AssetPool},
+    },
 };
 
 pub struct RunningState
@@ -46,10 +59,7 @@ impl Window
 {
     const DEFAULT_DIMS: (u32, u32) = (1024, 768);
 
-    fn new() -> Self
-    {
-        Self { state: None }
-    }
+    fn new() -> Self { Self { state: None } }
 
     pub fn run()
     {
@@ -141,14 +151,19 @@ impl ApplicationHandler for Window
 {
     fn resumed(&mut self, event_loop: &ActiveEventLoop)
     {
-        if self.state.is_some() { return; }
+        if self.state.is_some()
+        {
+            return;
+        }
 
         let window = Arc::new(
-            event_loop.create_window(
-                WindowAttributes::default()
-                    .with_title("Primrose")
-                    .with_inner_size(LogicalSize::new(Self::DEFAULT_DIMS.0, Self::DEFAULT_DIMS.1))
-            ).expect("Failed to create window")
+            event_loop
+                .create_window(
+                    WindowAttributes::default()
+                        .with_title("Primrose")
+                        .with_inner_size(LogicalSize::new(Self::DEFAULT_DIMS.0, Self::DEFAULT_DIMS.1)),
+                )
+                .expect("Failed to create window"),
         );
 
         let size = window.inner_size();
@@ -158,26 +173,22 @@ impl ApplicationHandler for Window
             .create_surface(window.clone())
             .expect("Failed to create surface");
 
-        let adapter = pollster::block_on(
-            instance.request_adapter(
-                &RequestAdapterOptions {
-                    power_preference: PowerPreference::default(),
-                    compatible_surface: Some(&surface),
-                    force_fallback_adapter: false,
-                }
-            )
-        ).expect("Failed to find viable adapter");
+        let adapter = pollster::block_on(instance.request_adapter(&RequestAdapterOptions {
+            power_preference: PowerPreference::default(),
+            compatible_surface: Some(&surface),
+            force_fallback_adapter: false,
+        }))
+        .expect("Failed to find viable adapter");
 
-        let (device, queue) = pollster::block_on(
-            adapter.request_device(
-                &DeviceDescriptor {
-                    label: None,
-                    required_features: Features::empty(),
-                    required_limits: Limits::default(),
-                },
-                None,
-            )
-        ).expect("Failed to create device");
+        let (device, queue) = pollster::block_on(adapter.request_device(
+            &DeviceDescriptor {
+                label: None,
+                required_features: Features::empty(),
+                required_limits: Limits::default(),
+            },
+            None,
+        ))
+        .expect("Failed to create device");
 
         let surface_capabilities = surface.get_capabilities(&adapter);
         let surface_format = surface_capabilities.formats[0];
@@ -202,54 +213,60 @@ impl ApplicationHandler for Window
             &device,
             &queue,
             &renderer.texture_bind_group_layout,
-        ).expect("Failed to init assetpool");
+        )
+        .expect("Failed to init assetpool");
 
         let sound_handler = SoundHandler::new().expect("Failed to init sound handler");
         let clock = Clock::new();
 
-        self.state = Some(
-            RunningState {
-                window,
-                surface,
-                device,
-                queue,
-                config,
-                renderer,
-                scene: Scene::new((size.width as f32, size.height as f32)),
-                input: Rc::new(RefCell::new(InputState::new())),
-                clock,
-                sound_handler,
-                asset_pool,
-                started: false,
-            }
-        )
+        self.state = Some(RunningState {
+            window,
+            surface,
+            device,
+            queue,
+            config,
+            renderer,
+            scene: Scene::new((size.width as f32, size.height as f32)),
+            input: Rc::new(RefCell::new(InputState::new())),
+            clock,
+            sound_handler,
+            asset_pool,
+            started: false,
+        })
     }
 
-    fn window_event(
-        &mut self,
-        event_loop: &ActiveEventLoop,
-        window_id: WindowId,
-        event: WindowEvent,
-    )
+    fn window_event(&mut self, event_loop: &ActiveEventLoop, window_id: WindowId, event: WindowEvent)
     {
-        let Some(state) = &mut self.state else { return };
+        let Some(state) = &mut self.state
+        else
+        {
+            return;
+        };
         match event
         {
             WindowEvent::CloseRequested => event_loop.exit(),
-            WindowEvent::Resized(size) => {
+            WindowEvent::Resized(size) =>
+            {
                 state.config.width = size.width;
                 state.config.height = size.height;
 
                 state.surface.configure(&state.device, &state.config);
-                state.scene.camera.update_viewport((size.width as f32, size.height as f32));
-            },
+                state
+                    .scene
+                    .camera
+                    .update_viewport((size.width as f32, size.height as f32));
+            }
             WindowEvent::KeyboardInput { event, .. } => state.input.borrow_mut().handle_key_event(event),
             WindowEvent::CursorMoved { position, .. } => state.input.borrow_mut().handle_cursor_event(position),
-            WindowEvent::MouseInput { state: button_state, button, .. }
-                => state.input.borrow_mut().handle_mouse_event(button_state, button),
+            WindowEvent::MouseInput {
+                state: button_state,
+                button,
+                ..
+            } => state.input.borrow_mut().handle_mouse_event(button_state, button),
             WindowEvent::RedrawRequested => Self::draw(state),
 
-            _ => {}
+            _ =>
+            {}
         }
     }
 }
