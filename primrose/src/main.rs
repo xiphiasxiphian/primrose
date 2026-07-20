@@ -1,6 +1,6 @@
-use engine::add;
+use engine::window::Window;
 
 fn main()
 {
-    println!("Hello, world! {}", add(4, 5));
+    Window::run();
 }

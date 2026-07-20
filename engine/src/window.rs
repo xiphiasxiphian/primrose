@@ -46,7 +46,7 @@ impl Window
 {
     const DEFAULT_DIMS: (u32, u32) = (1024, 768);
 
-    pub fn new() -> Self
+    fn new() -> Self
     {
         Self { state: None }
     }
@@ -57,7 +57,7 @@ impl Window
         event_loop.run_app(&mut Self::new()).expect("Event loop failed");
     }
 
-    pub fn draw(state: &mut RunningState)
+    fn draw(state: &mut RunningState)
     {
         let texture = state.asset_pool.get_texture("grass").unwrap();
 
