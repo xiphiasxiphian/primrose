@@ -60,12 +60,6 @@ impl TextureBatch
             return None;
         }
 
-        log::debug!("Flush: {} vertices, {} indices", vertices.len(), indices.len());
-        for (i, v) in vertices.iter().enumerate()
-        {
-            log::debug!("  v[{}] pos={:?}", i, v.position);
-        }
-
         self.pool.write(queue, &vertices, &indices)
     }
 }

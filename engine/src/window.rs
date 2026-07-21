@@ -56,7 +56,7 @@ pub struct Window
 
 impl Window
 {
-    const DEFAULT_DIMS: (u32, u32) = (1024, 768);
+    const DEFAULT_DIMS: (u32, u32) = (1920, 1080);
 
     fn new() -> Self { Self { state: None } }
 
