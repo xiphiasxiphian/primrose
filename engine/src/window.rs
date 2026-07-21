@@ -1,5 +1,6 @@
 use std::{cell::RefCell, rc::Rc, sync::Arc};
 
+use log::info;
 use wgpu::{
     Device, DeviceDescriptor, Features, Instance, Limits, PowerPreference, Queue, RequestAdapterOptions, Surface,
     SurfaceConfiguration, TextureUsages,
@@ -162,6 +163,8 @@ impl ApplicationHandler for Window
             return;
         }
 
+        info!("Configuring window ...");
+
         let window = Arc::new(
             event_loop
                 .create_window(
@@ -171,6 +174,8 @@ impl ApplicationHandler for Window
                 )
                 .expect("Failed to create window"),
         );
+
+        info!("Succesfully created window");
 
         let size = window.inner_size();
 
@@ -212,7 +217,11 @@ impl ApplicationHandler for Window
 
         surface.configure(&device, &config);
 
+        info!("Successfully configured GPU connection and surface");
+
         let renderer = Renderer::new(&device, surface_format);
+        info!("Successfully init renderer");
+
         let asset_pool = AssetPool::preloaded(
             assets::TEXTURES,
             assets::SOUNDS,
