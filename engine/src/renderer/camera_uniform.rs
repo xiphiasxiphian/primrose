@@ -1,4 +1,5 @@
 use glam::Mat4;
+use log::debug;
 use wgpu::{
     BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, BindGroupLayoutDescriptor, BindGroupLayoutEntry,
     BindingType, Buffer, BufferBindingType, BufferUsages, Device, Queue, ShaderStages,

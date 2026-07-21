@@ -67,10 +67,9 @@ impl Window
         event_loop.run_app(&mut Self::new()).expect("Event loop failed");
     }
 
-    fn draw(state: &mut RunningState)
+    fn on_start(state: &mut RunningState)
     {
         let texture = state.asset_pool.get_texture("grass").unwrap();
-
         state.scene.add(
             Object::new(
                 "grass",
@@ -92,17 +91,23 @@ impl Window
             )
             .with_texture(texture),
         );
+    }
 
+    fn draw(state: &mut RunningState)
+    {
         // scene init
         if !state.started
         {
-            let input = state.input.borrow();
-            state.scene.start(&mut ComponentContextIn {
-                input: &input,
-                assetpool: &state.asset_pool,
-                sound: &mut state.sound_handler,
-            });
+            {
+                let input = state.input.borrow();
+                state.scene.start(&mut ComponentContextIn {
+                    input: &input,
+                    assetpool: &state.asset_pool,
+                    sound: &mut state.sound_handler,
+                });
+            }
 
+            Self::on_start(state);
             state.started = true;
         }
 
@@ -238,13 +243,14 @@ impl ApplicationHandler for Window
         })
     }
 
-    fn window_event(&mut self, event_loop: &ActiveEventLoop, window_id: WindowId, event: WindowEvent)
+    fn window_event(&mut self, event_loop: &ActiveEventLoop, _window_id: WindowId, event: WindowEvent)
     {
         let Some(state) = &mut self.state
         else
         {
             return;
         };
+
         match event
         {
             WindowEvent::CloseRequested => event_loop.exit(),

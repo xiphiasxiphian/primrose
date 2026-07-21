@@ -1,3 +1,7 @@
 use engine::window::Window;
 
-fn main() { Window::run(); }
+fn main()
+{
+    env_logger::init();
+    Window::run();
+}
