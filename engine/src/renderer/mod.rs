@@ -176,7 +176,7 @@ impl Renderer
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
 
-            for (_, (texture, batch)) in &mut self.batches
+            for (texture, batch) in self.batches.values_mut()
             {
                 let Some(slice) = batch.flush(queue)
                 else

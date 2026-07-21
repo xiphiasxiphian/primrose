@@ -157,7 +157,7 @@ impl ApplicationHandler for Window
 {
     fn resumed(&mut self, event_loop: &ActiveEventLoop)
     {
-        if let Some(_) = self.state
+        if self.state.is_some()
         {
             return;
         }

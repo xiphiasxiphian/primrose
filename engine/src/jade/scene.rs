@@ -85,8 +85,8 @@ impl<'a> ComponentContextIn<'a>
         'c: 'b,
     {
         ComponentContext {
-            input: &self.input,
-            assetpool: &self.assetpool,
+            input: self.input,
+            assetpool: self.assetpool,
             camera,
             sound: self.sound,
         }

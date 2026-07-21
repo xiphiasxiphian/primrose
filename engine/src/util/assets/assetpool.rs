@@ -59,8 +59,7 @@ impl AssetPool
     pub fn get_sound(&self, id: &'static str) -> Result<SoundAsset, AssetPoolError>
     {
         self.sounds
-            .get(id)
-            .map(Clone::clone)
+            .get(id).cloned()
             .ok_or(AssetPoolError::NotFound(id))
     }
 }
