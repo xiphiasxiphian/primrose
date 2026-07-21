@@ -5,11 +5,7 @@ use wgpu::{
     SurfaceConfiguration, TextureUsages,
 };
 use winit::{
-    application::ApplicationHandler,
-    dpi::LogicalSize,
-    event::WindowEvent,
-    event_loop::{ActiveEventLoop, EventLoop},
-    window::{Window as NativeWindow, WindowAttributes, WindowId},
+    application::ApplicationHandler, dpi::{LogicalPosition, LogicalSize}, event::WindowEvent, event_loop::{ActiveEventLoop, EventLoop}, window::{Window as NativeWindow, WindowAttributes, WindowId},
 };
 
 use crate::{
@@ -56,7 +52,7 @@ pub struct Window
 
 impl Window
 {
-    const DEFAULT_DIMS: (u32, u32) = (1920, 1080);
+    const DEFAULT_DIMS: (u32, u32) = (1440, 810);
 
     fn new() -> Self { Self { state: None } }
 
@@ -160,17 +156,14 @@ impl ApplicationHandler for Window
 {
     fn resumed(&mut self, event_loop: &ActiveEventLoop)
     {
-        if self.state.is_some()
-        {
-            return;
-        }
+        if let Some(_) = self.state { return; }
 
         let window = Arc::new(
             event_loop
                 .create_window(
                     WindowAttributes::default()
                         .with_title("Primrose")
-                        .with_inner_size(LogicalSize::new(Self::DEFAULT_DIMS.0, Self::DEFAULT_DIMS.1)),
+                        .with_inner_size(LogicalSize::new(Self::DEFAULT_DIMS.0, Self::DEFAULT_DIMS.1))
                 )
                 .expect("Failed to create window"),
         );
