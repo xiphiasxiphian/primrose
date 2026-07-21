@@ -6,7 +6,7 @@ use wgpu::{
 };
 use winit::{
     application::ApplicationHandler,
-    dpi::{LogicalPosition, LogicalSize},
+    dpi::LogicalSize,
     event::WindowEvent,
     event_loop::{ActiveEventLoop, EventLoop},
     window::{Window as NativeWindow, WindowAttributes, WindowId},
