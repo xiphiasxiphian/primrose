@@ -1,12 +1,10 @@
 pub mod key;
 pub mod mouse;
 
-use std::{cell::RefCell, rc::Rc};
 
-use log::info;
 use strum::EnumCount;
 use winit::{
-    dpi::{PhysicalPosition, Position},
+    dpi::PhysicalPosition,
     event::{ElementState, KeyEvent},
     keyboard::PhysicalKey,
 };

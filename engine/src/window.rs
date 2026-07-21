@@ -1,6 +1,5 @@
 use std::{cell::RefCell, rc::Rc, sync::Arc};
 
-use log::{info, warn};
 use wgpu::{
     Device, DeviceDescriptor, Features, Instance, Limits, PowerPreference, Queue, RequestAdapterOptions, Surface,
     SurfaceConfiguration, TextureUsages,
@@ -28,7 +27,7 @@ use crate::{
     renderer::Renderer,
     util::assets::{
         self,
-        assetpool::{Asset, AssetPool},
+        assetpool::AssetPool,
     },
 };
 
