@@ -5,7 +5,11 @@ use wgpu::{
     SurfaceConfiguration, TextureUsages,
 };
 use winit::{
-    application::ApplicationHandler, dpi::{LogicalPosition, LogicalSize}, event::WindowEvent, event_loop::{ActiveEventLoop, EventLoop}, window::{Window as NativeWindow, WindowAttributes, WindowId},
+    application::ApplicationHandler,
+    dpi::{LogicalPosition, LogicalSize},
+    event::WindowEvent,
+    event_loop::{ActiveEventLoop, EventLoop},
+    window::{Window as NativeWindow, WindowAttributes, WindowId},
 };
 
 use crate::{
@@ -21,10 +25,7 @@ use crate::{
         scene::{ComponentContextIn, Scene},
     },
     renderer::Renderer,
-    util::assets::{
-        self,
-        assetpool::AssetPool,
-    },
+    util::assets::{self, assetpool::AssetPool},
 };
 
 pub struct RunningState
@@ -72,7 +73,7 @@ impl Window
             )
             .with_texture(texture.clone())
             .with_z_index(1)
-            .with_component(PlayerController { speed: 100.0 })
+            .with_component(PlayerController { speed: 200.0 })
             .with_component(CameraLock::default()),
         );
 
@@ -156,14 +157,17 @@ impl ApplicationHandler for Window
 {
     fn resumed(&mut self, event_loop: &ActiveEventLoop)
     {
-        if let Some(_) = self.state { return; }
+        if let Some(_) = self.state
+        {
+            return;
+        }
 
         let window = Arc::new(
             event_loop
                 .create_window(
                     WindowAttributes::default()
                         .with_title("Primrose")
-                        .with_inner_size(LogicalSize::new(Self::DEFAULT_DIMS.0, Self::DEFAULT_DIMS.1))
+                        .with_inner_size(LogicalSize::new(Self::DEFAULT_DIMS.0, Self::DEFAULT_DIMS.1)),
                 )
                 .expect("Failed to create window"),
         );

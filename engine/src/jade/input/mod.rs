@@ -1,7 +1,6 @@
 pub mod key;
 pub mod mouse;
 
-
 use strum::EnumCount;
 use winit::{
     dpi::PhysicalPosition,
