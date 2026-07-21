@@ -41,7 +41,7 @@ pub struct RunningState
     // user level
     renderer: Renderer,
     scene: Scene,
-    input: Rc<RefCell<InputState>>,
+    input: Arc<RefCell<InputState>>,
     clock: Clock,
     sound_handler: SoundHandler,
     asset_pool: AssetPool,
@@ -242,7 +242,7 @@ impl ApplicationHandler for Window
             config,
             renderer,
             scene: Scene::new((size.width as f32, size.height as f32)),
-            input: Rc::new(RefCell::new(InputState::new())),
+            input: Arc::new(RefCell::new(InputState::new())),
             clock,
             sound_handler,
             asset_pool,
