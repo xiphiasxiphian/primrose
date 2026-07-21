@@ -50,15 +50,19 @@ impl TextureBatch
     pub fn flush(&mut self, queue: &Queue) -> Option<BufferSlice>
     {
         let vertices = std::mem::take(&mut self.vertices);
-        let indices  = std::mem::take(&mut self.indices);
+        let indices = std::mem::take(&mut self.indices);
         self.min_z = i32::MAX;
 
         self.pool.reset();
 
-        if vertices.is_empty() { return None; }
+        if vertices.is_empty()
+        {
+            return None;
+        }
 
         log::debug!("Flush: {} vertices, {} indices", vertices.len(), indices.len());
-        for (i, v) in vertices.iter().enumerate() {
+        for (i, v) in vertices.iter().enumerate()
+        {
             log::debug!("  v[{}] pos={:?}", i, v.position);
         }
 

@@ -117,11 +117,13 @@ impl Window
         let output = match state.surface.get_current_texture()
         {
             Ok(texture) => texture,
-            Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) => {
+            Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) =>
+            {
                 state.surface.configure(&state.device, &state.config);
                 return;
             }
-            Err(e) => {
+            Err(e) =>
+            {
                 log::warn!("Dropped frame: {:?}", e);
                 return;
             }
