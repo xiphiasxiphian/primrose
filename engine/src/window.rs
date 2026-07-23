@@ -47,6 +47,98 @@ pub struct RunningState
     asset_pool: AssetPool,
 }
 
+impl RunningState
+{
+    fn on_start(&mut self)
+    {
+        let texture = self.asset_pool.get_texture("grass").unwrap();
+        self.scene.add(
+            Object::new(
+                "grass",
+                Transform::with_anchor((0.0, 0.0), (200.0, 200.0), Anchor::Center),
+            )
+            .with_texture(texture.clone())
+            .with_z_index(1)
+            .with_component(PlayerController { speed: 200.0 })
+            .with_component(CameraLock::default()),
+        );
+
+        self.scene.add(
+            Object::new(
+                "grass2",
+                Transform {
+                    pos: (200.0, 200.0),
+                    size: (100.0, 100.0),
+                },
+            )
+            .with_texture(texture),
+        );
+    }
+
+    fn draw(&mut self)
+    {
+        // scene init
+        if !self.started
+        {
+            {
+                let input = self.input.borrow();
+                self.scene.start(&mut ComponentContextIn {
+                    input: &input,
+                    assetpool: &self.asset_pool,
+                    sound: &mut self.sound_handler,
+                });
+            }
+
+            self.on_start();
+            self.started = true;
+        }
+
+        // main tick
+        let dt = self.clock.tick();
+
+        let output = match self.surface.get_current_texture()
+        {
+            Ok(texture) => texture,
+            Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) =>
+            {
+                self.surface.configure(&self.device, &self.config);
+                return;
+            }
+            Err(e) =>
+            {
+                log::warn!("Dropped frame: {:?}", e);
+                return;
+            }
+        };
+
+        {
+            let input = self.input.borrow();
+            self.scene.tick(
+                &mut ComponentContextIn {
+                    input: &input,
+                    assetpool: &self.asset_pool,
+                    sound: &mut self.sound_handler,
+                },
+                dt,
+            );
+        }
+
+        let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
+        self.renderer.draw(
+            self.scene.objects(),
+            &self.device,
+            &self.queue,
+            &view,
+            &self.scene.camera,
+        );
+
+        output.present();
+        self.input.borrow_mut().flush();
+
+        self.window.request_redraw(); // loop
+    }
+}
+
 pub struct Window
 {
     state: Option<RunningState>,
@@ -62,95 +154,6 @@ impl Window
     {
         let event_loop = EventLoop::new().expect("Failed to create event loop");
         event_loop.run_app(&mut Self::new()).expect("Event loop failed");
-    }
-
-    fn on_start(state: &mut RunningState)
-    {
-        let texture = state.asset_pool.get_texture("grass").unwrap();
-        state.scene.add(
-            Object::new(
-                "grass",
-                Transform::with_anchor((0.0, 0.0), (200.0, 200.0), Anchor::Center),
-            )
-            .with_texture(texture.clone())
-            .with_z_index(1)
-            .with_component(PlayerController { speed: 200.0 })
-            .with_component(CameraLock::default()),
-        );
-
-        state.scene.add(
-            Object::new(
-                "grass2",
-                Transform {
-                    pos: (200.0, 200.0),
-                    size: (100.0, 100.0),
-                },
-            )
-            .with_texture(texture),
-        );
-    }
-
-    fn draw(state: &mut RunningState)
-    {
-        // scene init
-        if !state.started
-        {
-            {
-                let input = state.input.borrow();
-                state.scene.start(&mut ComponentContextIn {
-                    input: &input,
-                    assetpool: &state.asset_pool,
-                    sound: &mut state.sound_handler,
-                });
-            }
-
-            Self::on_start(state);
-            state.started = true;
-        }
-
-        // main tick
-        let dt = state.clock.tick();
-
-        let output = match state.surface.get_current_texture()
-        {
-            Ok(texture) => texture,
-            Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) =>
-            {
-                state.surface.configure(&state.device, &state.config);
-                return;
-            }
-            Err(e) =>
-            {
-                log::warn!("Dropped frame: {:?}", e);
-                return;
-            }
-        };
-
-        {
-            let input = state.input.borrow();
-            state.scene.tick(
-                &mut ComponentContextIn {
-                    input: &input,
-                    assetpool: &state.asset_pool,
-                    sound: &mut state.sound_handler,
-                },
-                dt,
-            );
-        }
-
-        let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
-        state.renderer.draw(
-            state.scene.objects(),
-            &state.device,
-            &state.queue,
-            &view,
-            &state.scene.camera,
-        );
-
-        output.present();
-        state.input.borrow_mut().flush();
-
-        state.window.request_redraw(); // loop
     }
 }
 
@@ -279,7 +282,7 @@ impl ApplicationHandler for Window
                 button,
                 ..
             } => state.input.borrow_mut().handle_mouse_event(button_state, button),
-            WindowEvent::RedrawRequested => Self::draw(state),
+            WindowEvent::RedrawRequested => state.draw(),
 
             _ =>
             {}
