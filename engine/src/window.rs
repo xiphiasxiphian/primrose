@@ -50,6 +50,7 @@ pub struct RunningState
 pub struct Window
 {
     state: Option<RunningState>,
+    _pd: PhantomData,
 }
 
 impl Window
