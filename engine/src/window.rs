@@ -6,11 +6,7 @@ use wgpu::{
     SurfaceConfiguration, TextureUsages,
 };
 use winit::{
-    application::ApplicationHandler,
-    dpi::LogicalSize,
-    event::WindowEvent,
-    event_loop::{ActiveEventLoop, EventLoop},
-    window::{Window as NativeWindow, WindowAttributes, WindowId},
+    application::ApplicationHandler, dpi::LogicalSize, event::WindowEvent, event_loop::{ActiveEventLoop, EventLoop}, window::{CursorIcon, Fullscreen, Window as NativeWindow, WindowAttributes, WindowId},
 };
 
 use crate::{
@@ -142,18 +138,37 @@ impl RunningState
 pub struct Window
 {
     state: Option<RunningState>,
+    descriptor: WindowDescriptor,
 }
 
 impl Window
 {
-    const DEFAULT_DIMS: (u32, u32) = (1440, 810);
+    fn new(descriptor: &WindowDescriptor) -> Self { Self { state: None, descriptor: *descriptor } }
 
-    fn new() -> Self { Self { state: None } }
-
-    pub fn run()
+    pub fn run(descriptor: &WindowDescriptor)
     {
         let event_loop = EventLoop::new().expect("Failed to create event loop");
-        event_loop.run_app(&mut Self::new()).expect("Event loop failed");
+        event_loop.run_app(&mut Self::new(descriptor)).expect("Event loop failed");
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct WindowDescriptor
+{
+    pub title: &'static str,
+    pub dims: (u32, u32),
+    pub fullscreen: bool,
+}
+
+impl Default for WindowDescriptor
+{
+    fn default() -> Self
+    {
+        Self {
+            title: "Default Title",
+            dims: (1440, 810),
+            fullscreen: false,
+        }
     }
 }
 
@@ -172,8 +187,9 @@ impl ApplicationHandler for Window
             event_loop
                 .create_window(
                     WindowAttributes::default()
-                        .with_title("Primrose")
-                        .with_inner_size(LogicalSize::new(Self::DEFAULT_DIMS.0, Self::DEFAULT_DIMS.1)),
+                        .with_title(self.descriptor.title)
+                        .with_inner_size(LogicalSize::new(self.descriptor.dims.0, self.descriptor.dims.1))
+                        .with_fullscreen(self.descriptor.fullscreen.then_some(Fullscreen::Borderless(None))),
                 )
                 .expect("Failed to create window"),
         );
