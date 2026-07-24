@@ -26,12 +26,10 @@ impl WindowDescriptor
 {
     pub fn get_fullscreen(&self) -> Option<Fullscreen>
     {
-        self.fullscreen_options.and_then(|x| {
-            x.on_start.then_some(Fullscreen::Borderless(None))
-        })
+        self.fullscreen_options
+            .and_then(|x| x.on_start.then_some(Fullscreen::Borderless(None)))
     }
 }
-
 
 #[derive(Clone, Copy, Debug)]
 pub struct FullscreenOptions
@@ -46,7 +44,7 @@ impl Default for FullscreenOptions
     {
         Self {
             on_start: false,
-            toggle_key: Key::F11
+            toggle_key: Key::F11,
         }
     }
 }

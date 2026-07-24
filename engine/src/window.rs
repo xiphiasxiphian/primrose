@@ -6,11 +6,16 @@ use wgpu::{
     SurfaceConfiguration, TextureUsages,
 };
 use winit::{
-    application::ApplicationHandler, dpi::LogicalSize, event::WindowEvent, event_loop::{ActiveEventLoop, EventLoop}, window::{CursorIcon, Fullscreen, Window as NativeWindow, WindowAttributes, WindowId},
+    application::ApplicationHandler,
+    dpi::LogicalSize,
+    event::WindowEvent,
+    event_loop::{ActiveEventLoop, EventLoop},
+    window::{CursorIcon, Fullscreen, Window as NativeWindow, WindowAttributes, WindowId},
 };
 
 use crate::{
-    clock::Clock, jade::{
+    clock::Clock,
+    jade::{
         audio::SoundHandler,
         ecs::{
             components::{basic_controller::PlayerController, camera::camera_lock::CameraLock},
@@ -19,7 +24,12 @@ use crate::{
         },
         input::InputState,
         scene::{ComponentContextIn, Scene},
-    }, renderer::Renderer, util::{assets::{self, assetpool::AssetPool}, settings::window::{FullscreenOptions, WindowDescriptor}},
+    },
+    renderer::Renderer,
+    util::{
+        assets::{self, assetpool::AssetPool},
+        settings::window::{FullscreenOptions, WindowDescriptor},
+    },
 };
 
 pub struct RunningState
@@ -140,12 +150,20 @@ pub struct Window
 
 impl Window
 {
-    fn new(descriptor: &WindowDescriptor) -> Self { Self { state: None, descriptor: *descriptor } }
+    fn new(descriptor: &WindowDescriptor) -> Self
+    {
+        Self {
+            state: None,
+            descriptor: *descriptor,
+        }
+    }
 
     pub fn run(descriptor: &WindowDescriptor)
     {
         let event_loop = EventLoop::new().expect("Failed to create event loop");
-        event_loop.run_app(&mut Self::new(descriptor)).expect("Event loop failed");
+        event_loop
+            .run_app(&mut Self::new(descriptor))
+            .expect("Event loop failed");
     }
 
     fn window_key_hooks(state: &mut RunningState, descriptor: WindowDescriptor)
@@ -298,7 +316,8 @@ impl ApplicationHandler for Window
                 button,
                 ..
             } => state.input.borrow_mut().handle_mouse_event(button_state, button),
-            WindowEvent::RedrawRequested => {
+            WindowEvent::RedrawRequested =>
+            {
                 // per tick
                 Self::window_key_hooks(state, descriptor);
 
