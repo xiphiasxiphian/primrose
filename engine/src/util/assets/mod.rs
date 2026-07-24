@@ -1,4 +1,4 @@
-pub mod assetpool;
+pub(crate) mod assetpool;
 
 pub const TEXTURES: &[(&str, &[u8])] = &[("grass", include_bytes!("../../../assets/images/grass.png"))];
 

@@ -10,8 +10,7 @@ use winit::{
 };
 
 use crate::{
-    clock::Clock,
-    jade::{
+    clock::Clock, jade::{
         audio::SoundHandler,
         ecs::{
             components::{basic_controller::PlayerController, camera::camera_lock::CameraLock},
@@ -20,9 +19,7 @@ use crate::{
         },
         input::InputState,
         scene::{ComponentContextIn, Scene},
-    },
-    renderer::Renderer,
-    util::assets::{self, assetpool::AssetPool},
+    }, renderer::Renderer, util::{assets::{self, assetpool::AssetPool}, settings::window::{FullscreenOptions, WindowDescriptor}},
 };
 
 pub struct RunningState
@@ -150,24 +147,26 @@ impl Window
         let event_loop = EventLoop::new().expect("Failed to create event loop");
         event_loop.run_app(&mut Self::new(descriptor)).expect("Event loop failed");
     }
-}
 
-#[derive(Clone, Copy, Debug)]
-pub struct WindowDescriptor
-{
-    pub title: &'static str,
-    pub dims: (u32, u32),
-    pub fullscreen: bool,
-}
-
-impl Default for WindowDescriptor
-{
-    fn default() -> Self
+    fn window_key_hooks(state: &mut RunningState, descriptor: WindowDescriptor)
     {
-        Self {
-            title: "Default Title",
-            dims: (1440, 810),
-            fullscreen: false,
+        let input = state.input.borrow();
+
+        // window hooks
+        if let Some(fs_options) = descriptor.fullscreen_options
+        {
+            if input.is_key_down(fs_options.toggle_key)
+            {
+                match state.window.fullscreen()
+                {
+                    Some(_) => state.window.set_fullscreen(None),
+                    None => state.window.set_fullscreen(Some(Fullscreen::Borderless(None))),
+                }
+            }
+            else if input.is_key_down(FullscreenOptions::DEFAULT_ESCAPE_KEY)
+            {
+                state.window.set_fullscreen(None);
+            }
         }
     }
 }
@@ -189,7 +188,7 @@ impl ApplicationHandler for Window
                     WindowAttributes::default()
                         .with_title(self.descriptor.title)
                         .with_inner_size(LogicalSize::new(self.descriptor.dims.0, self.descriptor.dims.1))
-                        .with_fullscreen(self.descriptor.fullscreen.then_some(Fullscreen::Borderless(None))),
+                        .with_fullscreen(self.descriptor.get_fullscreen()),
                 )
                 .expect("Failed to create window"),
         );
@@ -271,6 +270,7 @@ impl ApplicationHandler for Window
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, _window_id: WindowId, event: WindowEvent)
     {
+        let descriptor = self.descriptor;
         let Some(state) = &mut self.state
         else
         {
@@ -298,7 +298,12 @@ impl ApplicationHandler for Window
                 button,
                 ..
             } => state.input.borrow_mut().handle_mouse_event(button_state, button),
-            WindowEvent::RedrawRequested => state.draw(),
+            WindowEvent::RedrawRequested => {
+                // per tick
+                Self::window_key_hooks(state, descriptor);
+
+                state.draw();
+            }
 
             _ =>
             {}

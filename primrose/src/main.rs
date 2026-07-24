@@ -1,4 +1,4 @@
-use engine::window::{Window, WindowDescriptor};
+use engine::{util::settings::window::WindowDescriptor, window::Window};
 
 fn main()
 {
