@@ -10,7 +10,7 @@ use winit::{
     dpi::LogicalSize,
     event::WindowEvent,
     event_loop::{ActiveEventLoop, EventLoop},
-    window::{CursorIcon, Fullscreen, Window as NativeWindow, WindowAttributes, WindowId},
+    window::{Fullscreen, Window as NativeWindow, WindowAttributes, WindowId},
 };
 
 use crate::{
