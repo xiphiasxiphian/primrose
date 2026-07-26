@@ -1,5 +1,5 @@
-pub(crate) mod assetpool;
+pub mod assetpool;
 
-pub const TEXTURES: &[(&str, &[u8])] = &[("grass", include_bytes!("../../../assets/images/grass.png"))];
+pub(crate) const TEXTURES: &[(&str, &[u8])] = &[("grass", include_bytes!("../../../assets/images/grass.png"))];
 
-pub const SOUNDS: &[(&str, &[u8])] = &[];
+pub(crate) const SOUNDS: &[(&str, &[u8])] = &[];

@@ -1,5 +1,6 @@
 use glam::{Mat4, Vec2, Vec3, camera::rh::proj::directx::orthographic};
 
+#[derive(Debug, Clone)]
 pub struct Camera
 {
     pub position: Vec2,

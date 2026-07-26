@@ -1,6 +1,6 @@
 use winit::window::Fullscreen;
 
-use crate::jade::input::key::Key;
+use crate::jade::{input::key::Key, scene::Scene};
 
 #[derive(Clone, Copy, Debug)]
 pub struct WindowDescriptor
@@ -14,9 +14,10 @@ impl Default for WindowDescriptor
 {
     fn default() -> Self
     {
+        let dims = (1440, 810);
         Self {
             title: "Default Title",
-            dims: (1440, 810),
+            dims,
             fullscreen_options: Some(FullscreenOptions::default()),
         }
     }

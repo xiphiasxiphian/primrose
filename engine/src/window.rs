@@ -1,9 +1,8 @@
-use std::{cell::RefCell, sync::Arc};
+use std::{cell::RefCell, rc::Rc, sync::Arc};
 
 use log::info;
 use wgpu::{
-    Device, DeviceDescriptor, Features, Instance, Limits, PowerPreference, Queue, RequestAdapterOptions, Surface,
-    SurfaceConfiguration, TextureUsages,
+    Device, DeviceDescriptor, Features, Instance, Limits, PowerPreference, Queue, RequestAdapterOptions, Surface, SurfaceConfiguration, TextureUsages,
 };
 use winit::{
     application::ApplicationHandler,
@@ -14,6 +13,7 @@ use winit::{
 };
 
 use crate::{
+    handler::WindowHandler,
     clock::Clock,
     jade::{
         audio::SoundHandler,
@@ -44,7 +44,7 @@ pub struct RunningState
     // user level
     renderer: Renderer,
     scene: Scene,
-    input: Arc<RefCell<InputState>>,
+    input: Rc<RefCell<InputState>>,
     clock: Clock,
     sound_handler: SoundHandler,
     asset_pool: AssetPool,
@@ -142,27 +142,29 @@ impl RunningState
     }
 }
 
-pub struct Window
+pub struct Window<H: WindowHandler>
 {
+    handler: H,
     state: Option<RunningState>,
     descriptor: WindowDescriptor,
 }
 
-impl Window
+impl<H: WindowHandler> Window<H>
 {
-    fn new(descriptor: &WindowDescriptor) -> Self
+    fn new(handler: H, descriptor: &WindowDescriptor) -> Self
     {
         Self {
+            handler,
             state: None,
             descriptor: *descriptor,
         }
     }
 
-    pub fn run(descriptor: &WindowDescriptor)
+    pub fn run(handler: H, descriptor: &WindowDescriptor)
     {
         let event_loop = EventLoop::new().expect("Failed to create event loop");
         event_loop
-            .run_app(&mut Self::new(descriptor))
+            .run_app(&mut Self::new(handler, descriptor))
             .expect("Event loop failed");
     }
 
@@ -189,7 +191,7 @@ impl Window
     }
 }
 
-impl ApplicationHandler for Window
+impl<H: WindowHandler> ApplicationHandler for Window<H>
 {
     fn resumed(&mut self, event_loop: &ActiveEventLoop)
     {
@@ -270,6 +272,9 @@ impl ApplicationHandler for Window
         let sound_handler = SoundHandler::new().expect("Failed to init sound handler");
         let clock = Clock::new();
 
+        let mut scene = self.handler.initial_scene((self.descriptor.dims.0 as f32, self.descriptor.dims.1 as f32), &asset_pool);
+        self.handler.on_start(&mut scene, &asset_pool);
+
         self.state = Some(RunningState {
             window,
             surface,
@@ -277,8 +282,8 @@ impl ApplicationHandler for Window
             queue,
             config,
             renderer,
-            scene: Scene::new((size.width as f32, size.height as f32)),
-            input: Arc::new(RefCell::new(InputState::new())),
+            scene,
+            input: Rc::new(RefCell::new(InputState::new())),
             clock,
             sound_handler,
             asset_pool,
