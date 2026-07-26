@@ -2,7 +2,8 @@ use std::{cell::RefCell, rc::Rc, sync::Arc};
 
 use log::info;
 use wgpu::{
-    Device, DeviceDescriptor, Features, Instance, Limits, PowerPreference, Queue, RequestAdapterOptions, Surface, SurfaceConfiguration, TextureUsages,
+    Device, DeviceDescriptor, Features, Instance, Limits, PowerPreference, Queue, RequestAdapterOptions, Surface,
+    SurfaceConfiguration, TextureUsages,
 };
 use winit::{
     application::ApplicationHandler,
@@ -13,8 +14,8 @@ use winit::{
 };
 
 use crate::{
-    handler::WindowHandler,
     clock::Clock,
+    handler::WindowHandler,
     jade::{
         audio::SoundHandler,
         ecs::{
@@ -272,8 +273,10 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
         let sound_handler = SoundHandler::new().expect("Failed to init sound handler");
         let clock = Clock::new();
 
-        let mut scene = self.handler.initial_scene((self.descriptor.dims.0 as f32, self.descriptor.dims.1 as f32), &asset_pool);
-        self.handler.on_start(&mut scene, &asset_pool);
+        let scene = self.handler.initial_scene(
+            (self.descriptor.dims.0 as f32, self.descriptor.dims.1 as f32),
+            &asset_pool,
+        );
 
         self.state = Some(RunningState {
             window,

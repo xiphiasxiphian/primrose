@@ -1,4 +1,16 @@
-use engine::{handler::WindowHandler, jade::{ecs::{components::{basic_controller::PlayerController, camera::camera_lock::CameraLock}, object::Object, transform::{Anchor, Transform}}, scene::Scene}, util::{assets::assetpool::AssetPool, settings::window::WindowDescriptor}, window::Window};
+use engine::{
+    handler::WindowHandler,
+    jade::{
+        ecs::{
+            components::{basic_controller::PlayerController, camera::camera_lock::CameraLock},
+            object::Object,
+            transform::{Anchor, Transform},
+        },
+        scene::Scene,
+    },
+    util::{assets::assetpool::AssetPool, settings::window::WindowDescriptor},
+    window::Window,
+};
 
 struct Handler;
 
@@ -16,7 +28,7 @@ impl WindowHandler for Handler
                 .with_texture(texture.clone())
                 .with_z_index(1)
                 .with_component(PlayerController { speed: 200.0 })
-                .with_component(CameraLock::default())
+                .with_component(CameraLock::default()),
             )
             .with_object(
                 Object::new(
@@ -34,8 +46,11 @@ impl WindowHandler for Handler
 fn main()
 {
     env_logger::init();
-    Window::run(Handler, &WindowDescriptor {
-        title: "Primrose",
-        ..Default::default()
-    });
+    Window::run(
+        Handler,
+        &WindowDescriptor {
+            title: "Primrose",
+            ..Default::default()
+        },
+    );
 }
