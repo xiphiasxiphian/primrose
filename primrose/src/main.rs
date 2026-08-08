@@ -16,6 +16,20 @@ struct Handler;
 
 impl WindowHandler for Handler
 {
+    fn textures() -> &'static [(&'static str, &'static [u8])]
+    where Self: Sized
+    {
+        &[
+            ("grass", include_bytes!("../assets/images/grass.png"))
+        ]
+    }
+
+    fn sounds() -> &'static [(&'static str, &'static [u8])]
+    where Self: Sized
+    {
+        &[]
+    }
+
     fn initial_scene(&mut self, dims: (f32, f32), assetpool: &AssetPool) -> Scene
     {
         let texture = assetpool.get_texture("grass").unwrap();

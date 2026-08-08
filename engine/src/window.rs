@@ -262,8 +262,8 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
         info!("Successfully init renderer");
 
         let asset_pool = AssetPool::preloaded(
-            assets::TEXTURES,
-            assets::SOUNDS,
+            H::textures(),
+            H::sounds(),
             &device,
             &queue,
             &renderer.texture_bind_group_layout,
