@@ -1,3 +1,5 @@
+pub mod manager;
+
 use crate::{
     jade::{
         audio::SoundHandler,

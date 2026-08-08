@@ -14,20 +14,13 @@ use winit::{
 };
 
 use crate::{
-    clock::Clock,
-    handler::WindowHandler,
-    jade::{
-        audio::SoundHandler,
-        ecs::{
+    clock::Clock, handler::WindowHandler, jade::{
+        audio::SoundHandler, ecs::{
             components::{basic_controller::PlayerController, camera::camera_lock::CameraLock},
             object::Object,
             transform::{Anchor, Transform},
-        },
-        input::InputState,
-        scene::{ComponentContextIn, Scene},
-    },
-    renderer::Renderer,
-    util::{
+        }, input::InputState, scene::{ComponentContextIn, Scene, manager::SceneManager},
+    }, renderer::Renderer, util::{
         assets::{self, assetpool::AssetPool},
         settings::window::{FullscreenOptions, WindowDescriptor},
     },
@@ -44,7 +37,7 @@ pub struct RunningState
 
     // user level
     renderer: Renderer,
-    scene: Scene,
+    scene_manager: SceneManager,
     input: Rc<RefCell<InputState>>,
     clock: Clock,
     sound_handler: SoundHandler,
@@ -53,47 +46,22 @@ pub struct RunningState
 
 impl RunningState
 {
-    fn on_start(&mut self)
-    {
-        let texture = self.asset_pool.get_texture("grass").unwrap();
-        self.scene.add(
-            Object::new(
-                "grass",
-                Transform::with_anchor((0.0, 0.0), (200.0, 200.0), Anchor::Center),
-            )
-            .with_texture(texture.clone())
-            .with_z_index(1)
-            .with_component(PlayerController { speed: 200.0 })
-            .with_component(CameraLock::default()),
-        );
-
-        self.scene.add(
-            Object::new(
-                "grass2",
-                Transform {
-                    pos: (200.0, 200.0),
-                    size: (100.0, 100.0),
-                },
-            )
-            .with_texture(texture),
-        );
-    }
-
     fn draw(&mut self)
     {
+        let scene = self.scene_manager.current_scene_mut();
+
         // scene init
         if !self.started
         {
             {
                 let input = self.input.borrow();
-                self.scene.start(&mut ComponentContextIn {
+                scene.start(&mut ComponentContextIn {
                     input: &input,
                     assetpool: &self.asset_pool,
                     sound: &mut self.sound_handler,
                 });
             }
 
-            self.on_start();
             self.started = true;
         }
 
@@ -117,7 +85,7 @@ impl RunningState
 
         {
             let input = self.input.borrow();
-            self.scene.tick(
+            scene.tick(
                 &mut ComponentContextIn {
                     input: &input,
                     assetpool: &self.asset_pool,
@@ -129,11 +97,11 @@ impl RunningState
 
         let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
         self.renderer.draw(
-            self.scene.objects(),
+            scene.objects(),
             &self.device,
             &self.queue,
             &view,
-            &self.scene.camera,
+            &scene.camera,
         );
 
         output.present();
@@ -273,10 +241,10 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
         let sound_handler = SoundHandler::new().expect("Failed to init sound handler");
         let clock = Clock::new();
 
-        let scene = self.handler.initial_scene(
+        let scene_manager = SceneManager::preloaded(self.handler.scenes(
             (self.descriptor.dims.0 as f32, self.descriptor.dims.1 as f32),
             &asset_pool,
-        );
+        ), H::initial_scene()).expect("Failed to init scene manager");
 
         self.state = Some(RunningState {
             window,
@@ -285,7 +253,7 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
             queue,
             config,
             renderer,
-            scene,
+            scene_manager,
             input: Rc::new(RefCell::new(InputState::new())),
             clock,
             sound_handler,
@@ -313,7 +281,8 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
 
                 state.surface.configure(&state.device, &state.config);
                 state
-                    .scene
+                    .scene_manager
+                    .current_scene_mut()
                     .camera
                     .update_viewport((size.width as f32, size.height as f32));
             }
