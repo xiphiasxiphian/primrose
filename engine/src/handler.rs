@@ -1,5 +1,5 @@
 use crate::{
-    jade::scene::{Scene, manager::ManagedScene},
+    jade::scene::manager::ManagedScene,
     util::assets::assetpool::AssetPool,
 };
 

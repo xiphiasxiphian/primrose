@@ -18,17 +18,12 @@ use crate::{
     handler::WindowHandler,
     jade::{
         audio::SoundHandler,
-        ecs::{
-            components::{basic_controller::PlayerController, camera::camera_lock::CameraLock},
-            object::Object,
-            transform::{Anchor, Transform},
-        },
         input::InputState,
-        scene::{ComponentContextIn, Scene, manager::SceneManager},
+        scene::{ComponentContextIn, manager::SceneManager},
     },
     renderer::Renderer,
     util::{
-        assets::{self, assetpool::AssetPool},
+        assets::assetpool::AssetPool,
         settings::window::{FullscreenOptions, WindowDescriptor},
     },
 };
