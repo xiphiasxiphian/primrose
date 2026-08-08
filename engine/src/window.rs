@@ -14,13 +14,20 @@ use winit::{
 };
 
 use crate::{
-    clock::Clock, handler::WindowHandler, jade::{
-        audio::SoundHandler, ecs::{
+    clock::Clock,
+    handler::WindowHandler,
+    jade::{
+        audio::SoundHandler,
+        ecs::{
             components::{basic_controller::PlayerController, camera::camera_lock::CameraLock},
             object::Object,
             transform::{Anchor, Transform},
-        }, input::InputState, scene::{ComponentContextIn, Scene, manager::SceneManager},
-    }, renderer::Renderer, util::{
+        },
+        input::InputState,
+        scene::{ComponentContextIn, Scene, manager::SceneManager},
+    },
+    renderer::Renderer,
+    util::{
         assets::{self, assetpool::AssetPool},
         settings::window::{FullscreenOptions, WindowDescriptor},
     },
@@ -96,13 +103,8 @@ impl RunningState
         }
 
         let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
-        self.renderer.draw(
-            scene.objects(),
-            &self.device,
-            &self.queue,
-            &view,
-            &scene.camera,
-        );
+        self.renderer
+            .draw(scene.objects(), &self.device, &self.queue, &view, &scene.camera);
 
         output.present();
         self.input.borrow_mut().flush();
@@ -241,10 +243,14 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
         let sound_handler = SoundHandler::new().expect("Failed to init sound handler");
         let clock = Clock::new();
 
-        let scene_manager = SceneManager::preloaded(self.handler.scenes(
-            (self.descriptor.dims.0 as f32, self.descriptor.dims.1 as f32),
-            &asset_pool,
-        ), H::initial_scene()).expect("Failed to init scene manager");
+        let scene_manager = SceneManager::preloaded(
+            self.handler.scenes(
+                (self.descriptor.dims.0 as f32, self.descriptor.dims.1 as f32),
+                &asset_pool,
+            ),
+            H::initial_scene(),
+        )
+        .expect("Failed to init scene manager");
 
         self.state = Some(RunningState {
             window,

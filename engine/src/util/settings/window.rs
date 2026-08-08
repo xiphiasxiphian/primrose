@@ -1,6 +1,6 @@
 use winit::window::Fullscreen;
 
-use crate::jade::{input::key::Key};
+use crate::jade::input::key::Key;
 
 #[derive(Clone, Copy, Debug)]
 pub struct WindowDescriptor

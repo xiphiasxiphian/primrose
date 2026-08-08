@@ -1,13 +1,15 @@
-use std::iter;
-
 use engine::{
-    handler::WindowHandler, jade::{
+    handler::WindowHandler,
+    jade::{
         ecs::{
             components::{basic_controller::PlayerController, camera::camera_lock::CameraLock},
             object::Object,
             transform::{Anchor, Transform},
-        }, scene::{Scene, manager::ManagedScene},
-    }, util::{assets::assetpool::AssetPool, settings::window::WindowDescriptor}, window::Window,
+        },
+        scene::{Scene, manager::ManagedScene},
+    },
+    util::{assets::assetpool::AssetPool, settings::window::WindowDescriptor},
+    window::Window,
 };
 
 struct Handler;
@@ -15,26 +17,30 @@ struct Handler;
 impl WindowHandler for Handler
 {
     fn textures() -> &'static [(&'static str, &'static [u8])]
-    where Self: Sized
+    where
+        Self: Sized,
     {
-        &[
-            ("grass", include_bytes!("../assets/images/grass.png"))
-        ]
+        &[("grass", include_bytes!("../assets/images/grass.png"))]
     }
 
     fn sounds() -> &'static [(&'static str, &'static [u8])]
-    where Self: Sized
+    where
+        Self: Sized,
     {
         &[]
     }
 
-    fn scenes(&mut self, dims: (f32, f32), assetpool: &AssetPool) -> impl IntoIterator<Item = (&'static str, ManagedScene)>
+    fn scenes(
+        &mut self,
+        dims: (f32, f32),
+        assetpool: &AssetPool,
+    ) -> impl IntoIterator<Item = (&'static str, ManagedScene)>
     {
         let texture = assetpool.get_texture("grass").unwrap();
-        vec![
-            (
-                "base",
-                ManagedScene::eager(Scene::new(dims)
+        vec![(
+            "base",
+            ManagedScene::eager(
+                Scene::new(dims)
                     .with_object(
                         Object::new(
                             "grass",
@@ -54,10 +60,9 @@ impl WindowHandler for Handler
                             },
                         )
                         .with_texture(texture),
-                    )
-                )
-            )
-        ]
+                    ),
+            ),
+        )]
     }
 
     fn initial_scene() -> &'static str { "base" }

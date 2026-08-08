@@ -1,4 +1,8 @@
-use std::{cell::RefCell, collections::{HashMap, hash_map::Entry}, mem::{self, zeroed}};
+use std::{
+    cell::RefCell,
+    collections::{HashMap, hash_map::Entry},
+    mem::{self, zeroed},
+};
 
 use crate::jade::scene::Scene;
 
@@ -9,7 +13,7 @@ enum ManagedSceneInner
     Lazy(Box<dyn FnOnce() -> Scene>),
 
     #[doc(hidden)]
-    Evaluating
+    Evaluating,
 }
 
 impl ManagedSceneInner
@@ -19,7 +23,8 @@ impl ManagedSceneInner
         if let Self::Lazy(_) = self
         {
             let old = std::mem::replace(self, Self::Evaluating);
-            let scene = match old {
+            let scene = match old
+            {
                 Self::Lazy(f) => f(),
                 _ => unreachable!(),
             };
@@ -37,20 +42,11 @@ impl ManagedSceneInner
 
 impl ManagedScene
 {
-    pub(super) fn resolve(&mut self) -> &mut Scene
-    {
-        self.0.resolve()
-    }
+    pub(super) fn resolve(&mut self) -> &mut Scene { self.0.resolve() }
 
-    pub fn eager(scene: Scene) -> Self
-    {
-        Self(ManagedSceneInner::Resolved(scene))
-    }
+    pub fn eager(scene: Scene) -> Self { Self(ManagedSceneInner::Resolved(scene)) }
 
-    pub fn lazy(f: Box<dyn FnOnce() -> Scene>) -> Self
-    {
-        Self(ManagedSceneInner::Lazy(f))
-    }
+    pub fn lazy(f: Box<dyn FnOnce() -> Scene>) -> Self { Self(ManagedSceneInner::Lazy(f)) }
 }
 
 pub struct SceneManager
@@ -67,7 +63,10 @@ impl SceneManager
     ) -> Option<Self>
     {
         let scenes = HashMap::from_iter(iter);
-        if !scenes.contains_key(initial_scene) { return None; }
+        if !scenes.contains_key(initial_scene)
+        {
+            return None;
+        }
 
         Some(Self {
             scenes: scenes,
@@ -80,7 +79,8 @@ impl SceneManager
         match self.scenes.entry(name)
         {
             Entry::Occupied(_) => false,
-            Entry::Vacant(e) => {
+            Entry::Vacant(e) =>
+            {
                 e.insert_entry(scene);
                 true
             }
@@ -113,9 +113,13 @@ impl SceneManager
 
     pub fn switch_with<F>(&mut self, target: &'static str, f: F) -> bool
     where
-        F: FnOnce(&mut Scene)
+        F: FnOnce(&mut Scene),
     {
-        let Some(new_scene) = self.scenes.get_mut(target) else { return false; };
+        let Some(new_scene) = self.scenes.get_mut(target)
+        else
+        {
+            return false;
+        };
         f(new_scene.resolve());
 
         true
