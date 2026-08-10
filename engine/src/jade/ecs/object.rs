@@ -1,4 +1,4 @@
-use std::mem;
+use std::{any::Any, mem};
 
 use crate::{
     jade::ecs::{
@@ -65,14 +65,14 @@ impl Object
 
     pub fn get_component<C: Component>(&self) -> Option<&C>
     {
-        self.components.iter().find_map(|x| x.as_any().downcast_ref::<C>())
+        self.components.iter().find_map(|x| (x.as_ref() as &dyn Any).downcast_ref::<C>())
     }
 
     pub fn get_component_mut<C: Component>(&mut self) -> Option<&mut C>
     {
         self.components
             .iter_mut()
-            .find_map(|x| x.as_any_mut().downcast_mut::<C>())
+            .find_map(|x| (x.as_mut() as &mut dyn Any).downcast_mut::<C>())
     }
 
     pub fn has_component<C: Component>(&self) -> bool { self.get_component::<C>().is_some() }

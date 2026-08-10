@@ -4,7 +4,6 @@ use glam::Vec2;
 
 use crate::jade::ecs::{
     component::{Component, ComponentContext},
-    components::default_any_impl,
     object::Object,
     transform::Anchor,
 };
@@ -36,6 +35,4 @@ impl Component for CameraLock
 
         ctx.camera.position = Vec2::new(x as f32 + offset_x, y as f32 + offset_y)
     }
-
-    default_any_impl!();
 }

@@ -1,9 +1,6 @@
-use std::any::Any;
-
 use crate::jade::{
     ecs::{
         component::{Component, ComponentContext},
-        components::default_any_impl,
         object::Object,
     },
     input::key::Key,
@@ -37,6 +34,4 @@ impl Component for PlayerController
             parent.transform.pos.1 += self.speed * dt;
         }
     }
-
-    default_any_impl!();
 }
