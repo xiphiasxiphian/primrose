@@ -19,19 +19,19 @@ impl Component for PlayerController
 
         if input.is_key_held(Key::A)
         {
-            parent.transform.pos.0 -= self.speed * dt;
+            parent.transform.pos.x -= self.speed * dt;
         }
         if input.is_key_held(Key::D)
         {
-            parent.transform.pos.0 += self.speed * dt;
+            parent.transform.pos.x += self.speed * dt;
         }
         if input.is_key_held(Key::W)
         {
-            parent.transform.pos.1 -= self.speed * dt;
+            parent.transform.pos.y -= self.speed * dt;
         }
         if input.is_key_held(Key::S)
         {
-            parent.transform.pos.1 += self.speed * dt;
+            parent.transform.pos.y += self.speed * dt;
         }
     }
 }

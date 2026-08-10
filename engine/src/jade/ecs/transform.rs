@@ -1,7 +1,9 @@
-type Position = (f64, f64);
-type Size = (f64, f64);
+use glam::DVec2;
 
-#[derive(Debug, Default, PartialEq, PartialOrd, Copy, Clone)]
+type Position = DVec2;
+type Size = DVec2;
+
+#[derive(Debug, Default, PartialEq, Copy, Clone)]
 pub struct Transform
 {
     pub pos: Position,
@@ -26,7 +28,7 @@ impl Transform
 
     pub fn scale(&mut self, factor: f64)
     {
-        self.size = ((self.size.0 * factor).max(0.0), (self.size.1 * factor).max(0.0))
+        self.size = (self.size * factor).max(DVec2::ZERO)
     }
 
     pub fn stretched(&self, x_factor: f64, y_factor: f64) -> Self
@@ -39,7 +41,7 @@ impl Transform
 
     pub fn stretch(&mut self, x_factor: f64, y_factor: f64)
     {
-        self.size = ((self.size.0 * x_factor).max(0.0), (self.size.1 * y_factor).max(0.0))
+        self.size = self.size * DVec2::new(x_factor, y_factor).max(DVec2::ZERO);
     }
 }
 
@@ -56,28 +58,28 @@ pub enum Anchor
 
 impl Anchor
 {
-    pub fn to_top_left(self, pos @ (x, y): Position, (w, h): Size) -> Position
+    pub fn to_top_left(self, Position { x, y }: Position, Size { x: w, y: h }: Size) -> Position
     {
         match self
         {
-            Anchor::TopLeft => pos,
+            Anchor::TopLeft => (x, y),
             Anchor::TopRight => (x - w, y),
             Anchor::BottomLeft => (x, y - h),
             Anchor::BottomRight => (x - w, y - h),
             Anchor::Center => (x - (w / 2.0), y - (h / 2.0)),
-        }
+        }.into()
     }
 
-    pub fn to_anchor(self, target: Self, old_pos: Position, size @ (w, h): Size) -> Position
+    pub fn to_anchor(self, target: Self, old_pos: Position, size @ Size { x: w, y: h }: Size) -> Position
     {
-        let pos @ (x, y) = self.to_top_left(old_pos, size);
+        let DVec2 { x, y } = self.to_top_left(old_pos, size);
         match target
         {
-            Anchor::TopLeft => pos,
+            Anchor::TopLeft => (x, y),
             Anchor::TopRight => (x + w, y),
             Anchor::BottomLeft => (x, y + h),
             Anchor::BottomRight => (x + w, y + h),
             Anchor::Center => (x + (w / 2.0), y + (h / 2.0)),
-        }
+        }.into()
     }
 }

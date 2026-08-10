@@ -113,10 +113,10 @@ impl Renderable for Object
     fn mesh(&self) -> Mesh
     {
         Mesh::quad(
-            self.transform.pos.0 as f32,
-            self.transform.pos.1 as f32,
-            self.transform.size.0 as f32,
-            self.transform.size.1 as f32,
+            self.transform.pos.x as f32,
+            self.transform.pos.y as f32,
+            self.transform.size.x as f32,
+            self.transform.size.y as f32,
         )
     }
 

@@ -44,7 +44,7 @@ impl WindowHandler for Handler
                     .with_object(
                         Object::new(
                             "grass",
-                            Transform::with_anchor((0.0, 0.0), (200.0, 200.0), Anchor::Center),
+                            Transform::with_anchor((0.0, 0.0).into(), (200.0, 200.0).into(), Anchor::Center),
                         )
                         .with_texture(texture.clone())
                         .with_z_index(1)
@@ -55,8 +55,8 @@ impl WindowHandler for Handler
                         Object::new(
                             "grass2",
                             Transform {
-                                pos: (200.0, 200.0),
-                                size: (100.0, 100.0),
+                                pos: (200.0, 200.0).into(),
+                                size: (100.0, 100.0).into(),
                             },
                         )
                         .with_texture(texture),
