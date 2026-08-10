@@ -1,15 +1,14 @@
+use std::iter;
+
 use engine::{
-    handler::WindowHandler,
-    jade::{
+    glam::DVec2, handler::WindowHandler, jade::{
         ecs::{
             components::{basic_controller::PlayerController, camera::camera_lock::CameraLock},
             object::Object,
             transform::{Anchor, Transform},
         },
         scene::{Scene, manager::ManagedScene},
-    },
-    util::{assets::assetpool::AssetPool, settings::window::WindowDescriptor},
-    window::Window,
+    }, util::{assets::assetpool::AssetPool, settings::window::WindowDescriptor}, window::Window,
 };
 
 struct Handler;
@@ -37,14 +36,14 @@ impl WindowHandler for Handler
     ) -> impl IntoIterator<Item = (&'static str, ManagedScene)>
     {
         let texture = assetpool.get_texture("grass").unwrap();
-        vec![(
+        iter::once_with(move || (
             "base",
             ManagedScene::eager(
                 Scene::new(dims)
                     .with_object(
                         Object::new(
                             "grass",
-                            Transform::with_anchor((0.0, 0.0).into(), (200.0, 200.0).into(), Anchor::Center),
+                            Transform::with_anchor(DVec2::ZERO, DVec2::splat(200.0), Anchor::Center),
                         )
                         .with_texture(texture.clone())
                         .with_z_index(1)
@@ -62,7 +61,7 @@ impl WindowHandler for Handler
                         .with_texture(texture),
                     ),
             ),
-        )]
+        ))
     }
 
     fn initial_scene() -> &'static str { "base" }
