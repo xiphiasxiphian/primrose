@@ -1,49 +1,8 @@
 use std::collections::{HashMap, hash_map::Entry};
 
-use crate::jade::scene::Scene;
+use crate::{jade::scene::Scene, util::assets::ManagedResource};
 
-pub struct ManagedScene(ManagedSceneInner);
-enum ManagedSceneInner
-{
-    Resolved(Scene),
-    Lazy(Box<dyn FnOnce() -> Scene>),
-
-    #[doc(hidden)]
-    Evaluating,
-}
-
-impl ManagedSceneInner
-{
-    pub fn resolve(&mut self) -> &mut Scene
-    {
-        if let Self::Lazy(_) = self
-        {
-            let old = std::mem::replace(self, Self::Evaluating);
-            let scene = match old
-            {
-                Self::Lazy(f) => f(),
-                _ => unreachable!(),
-            };
-
-            *self = Self::Resolved(scene);
-        }
-
-        match self
-        {
-            Self::Resolved(s) => s,
-            _ => unreachable!(),
-        }
-    }
-}
-
-impl ManagedScene
-{
-    pub(super) fn resolve(&mut self) -> &mut Scene { self.0.resolve() }
-
-    pub fn eager(scene: Scene) -> Self { Self(ManagedSceneInner::Resolved(scene)) }
-
-    pub fn lazy(f: Box<dyn FnOnce() -> Scene>) -> Self { Self(ManagedSceneInner::Lazy(f)) }
-}
+pub type ManagedScene = ManagedResource<Scene>;
 
 pub struct SceneManager
 {
@@ -88,7 +47,7 @@ impl SceneManager
         self.scenes
             .get_mut(&self.current)
             .expect("Current scene set to invalid scene. This should be impossible")
-            .resolve()
+            .get()
     }
 
     pub fn current_scene_mut(&mut self) -> &mut Scene
@@ -96,12 +55,12 @@ impl SceneManager
         self.scenes
             .get_mut(&self.current)
             .expect("Current scene set to invalid scene. This should be impossible")
-            .resolve()
+            .get()
     }
 
     pub fn switch(&mut self, target: &'static str) -> Option<&mut Scene>
     {
-        let result = self.scenes.get_mut(target)?.resolve();
+        let result = self.scenes.get_mut(target)?.get();
         self.current = target;
 
         Some(result)
@@ -116,7 +75,7 @@ impl SceneManager
         {
             return false;
         };
-        f(new_scene.resolve());
+        f(new_scene.get());
 
         true
     }
