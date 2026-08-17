@@ -19,41 +19,42 @@ pub struct AssetPool
 
 impl AssetPool
 {
-
-pub fn preloaded(
+    pub fn preloaded(
         textures: impl IntoIterator<Item = (&'static str, ManagedResource<&'static [u8]>)>,
         sounds: impl IntoIterator<Item = (&'static str, ManagedResource<&'static [u8]>)>,
         device: Device,
         queue: Queue,
         layout: BindGroupLayout,
-    ) -> Result<Self, AssetPoolError> {
+    ) -> Result<Self, AssetPoolError>
+    {
         let mut pool = Self::default();
 
         let default_texture = Arc::new(Texture::from_bytes(&[], &device, &queue, &layout)?);
         let default_sound = StaticSoundData::from_cursor(std::io::Cursor::new(&[]))?;
 
-        for (name, bytes_resource) in textures {
+        for (name, bytes_resource) in textures
+        {
             let device_clone = device.clone();
             let queue_clone = queue.clone();
             let layout_clone = layout.clone();
             let default_tex_clone = default_texture.clone();
 
             let texture = bytes_resource.map(move |raw_bytes| {
-                Texture::from_bytes(raw_bytes, &device_clone, &queue_clone, &layout_clone)
-                    .map_or_else(
-                        |e| {
-                            log::error!("Failed to load texture {}. Raw Error: {}", name, e);
-                            default_tex_clone
-                        },
-                        Arc::new,
-                    )
+                Texture::from_bytes(raw_bytes, &device_clone, &queue_clone, &layout_clone).map_or_else(
+                    |e| {
+                        log::error!("Failed to load texture {}. Raw Error: {}", name, e);
+                        default_tex_clone
+                    },
+                    Arc::new,
+                )
             });
 
             pool.textures.insert(name, texture);
             log::info!("Queued texture: {}", name);
         }
 
-        for (name, bytes_resource) in sounds {
+        for (name, bytes_resource) in sounds
+        {
             let default_snd_clone = default_sound.clone();
 
             let sound = bytes_resource.map(move |raw_bytes| {
@@ -75,9 +76,7 @@ pub fn preloaded(
     {
         self.textures
             .get_mut(id)
-            .map(|x| {
-                x.get().clone()
-            })
+            .map(|x| x.get().clone())
             .ok_or(AssetPoolError::NotFound(id))
     }
 

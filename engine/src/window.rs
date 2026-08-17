@@ -2,7 +2,8 @@ use std::{cell::RefCell, rc::Rc, sync::Arc};
 
 use log::{LevelFilter::Trace, info};
 use wgpu::{
-    CurrentSurfaceTexture, Device, DeviceDescriptor, ExperimentalFeatures, Features, Instance, Limits, MemoryHints, PowerPreference, Queue, RequestAdapterOptions, Surface, SurfaceColorSpace, SurfaceConfiguration, TextureUsages,
+    CurrentSurfaceTexture, Device, DeviceDescriptor, ExperimentalFeatures, Features, Instance, Limits, MemoryHints,
+    PowerPreference, Queue, RequestAdapterOptions, Surface, SurfaceColorSpace, SurfaceConfiguration, TextureUsages,
 };
 use winit::{
     application::ApplicationHandler,
@@ -70,20 +71,24 @@ impl RunningState
         let dt = self.clock.tick();
 
         let surface_frame = self.surface.get_current_texture();
-        let output = match surface_frame {
+        let output = match surface_frame
+        {
             CurrentSurfaceTexture::Success(texture) => texture,
 
-            CurrentSurfaceTexture::Suboptimal(texture) => {
+            CurrentSurfaceTexture::Suboptimal(texture) =>
+            {
                 self.surface.configure(&self.device, &self.config);
                 texture
             }
 
-            CurrentSurfaceTexture::Lost | CurrentSurfaceTexture::Outdated => {
+            CurrentSurfaceTexture::Lost | CurrentSurfaceTexture::Outdated =>
+            {
                 self.surface.configure(&self.device, &self.config);
                 return;
             }
 
-            status => {
+            status =>
+            {
                 log::warn!("Dropped frame: {:?}", status);
                 return;
             }
@@ -200,16 +205,14 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
         }))
         .expect("Failed to find viable adapter");
 
-        let (device, queue) = pollster::block_on(adapter.request_device(
-            &DeviceDescriptor {
-                label: None,
-                required_features: Features::empty(),
-                required_limits: Limits::default(),
-                experimental_features: ExperimentalFeatures::disabled(),
-                memory_hints: MemoryHints::Performance,
-                trace: wgpu::Trace::Off,
-            }
-        ))
+        let (device, queue) = pollster::block_on(adapter.request_device(&DeviceDescriptor {
+            label: None,
+            required_features: Features::empty(),
+            required_limits: Limits::default(),
+            experimental_features: ExperimentalFeatures::disabled(),
+            memory_hints: MemoryHints::Performance,
+            trace: wgpu::Trace::Off,
+        }))
         .expect("Failed to create device");
 
         let surface_capabilities = surface.get_capabilities(&adapter);

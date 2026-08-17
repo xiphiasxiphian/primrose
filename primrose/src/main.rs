@@ -1,14 +1,21 @@
 use std::iter;
 
 use engine::{
-    glam::DVec2, handler::WindowHandler, jade::{
+    glam::DVec2,
+    handler::WindowHandler,
+    jade::{
         ecs::{
             components::{basic_controller::PlayerController, camera::camera_lock::CameraLock},
             object::Object,
             transform::{Anchor, Transform},
         },
         scene::{Scene, manager::ManagedScene},
-    }, util::{assets::{ManagedResource, assetpool::AssetPool}, settings::window::WindowDescriptor}, window::Window,
+    },
+    util::{
+        assets::{ManagedResource, assetpool::AssetPool},
+        settings::window::WindowDescriptor,
+    },
+    window::Window,
 };
 
 struct Handler;
@@ -19,7 +26,10 @@ impl WindowHandler for Handler
     where
         Self: Sized,
     {
-        [("grass", ManagedResource::eager(&include_bytes!("../assets/images/grass.png")[..]))]
+        [(
+            "grass",
+            ManagedResource::eager(&include_bytes!("../assets/images/grass.png")[..]),
+        )]
     }
 
     fn sounds() -> impl IntoIterator<Item = (&'static str, ManagedResource<&'static [u8]>)>
