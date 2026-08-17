@@ -1,6 +1,5 @@
-use std::any::Any;
 
-use glam::{DVec2, Vec2};
+use glam::Vec2;
 
 use crate::jade::ecs::{
     component::{Component, ComponentContext},

@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Rc, sync::Arc};
 
-use log::{LevelFilter::Trace, info};
+use log::info;
 use wgpu::{
     CurrentSurfaceTexture, Device, DeviceDescriptor, ExperimentalFeatures, Features, Instance, Limits, MemoryHints,
     PowerPreference, Queue, RequestAdapterOptions, Surface, SurfaceColorSpace, SurfaceConfiguration, TextureUsages,
