@@ -3,9 +3,7 @@ use std::path::Path;
 
 use image::{DynamicImage, GenericImageView, ImageError};
 use wgpu::{
-    BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, BindingResource, Device, Extent3d,
-    ImageCopyTexture, ImageDataLayout, Queue, Sampler, SamplerDescriptor, TextureDescriptor, TextureFormat,
-    TextureUsages, TextureView, TextureViewDescriptor,
+    BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, BindingResource, Device, Extent3d, Queue, Sampler, SamplerDescriptor, TexelCopyBufferLayout, TexelCopyTextureInfo, TextureDescriptor, TextureFormat, TextureUsages, TextureView, TextureViewDescriptor,
 };
 
 pub struct Texture
@@ -63,14 +61,14 @@ impl Texture
         });
 
         queue.write_texture(
-            ImageCopyTexture {
+            TexelCopyTextureInfo {
                 texture: &diffuse_texture,
                 mip_level: 0,
                 origin: wgpu::Origin3d::ZERO,
                 aspect: wgpu::TextureAspect::All,
             },
             &premultiplied,
-            ImageDataLayout {
+            TexelCopyBufferLayout {
                 offset: 0,
                 bytes_per_row: Some(4 * texture_size.width),
                 rows_per_image: Some(texture_size.height),

@@ -1,42 +1,38 @@
 use std::iter;
 
 use engine::{
-    glam::DVec2,
-    handler::WindowHandler,
-    jade::{
+    glam::DVec2, handler::WindowHandler, jade::{
         ecs::{
             components::{basic_controller::PlayerController, camera::camera_lock::CameraLock},
             object::Object,
             transform::{Anchor, Transform},
         },
         scene::{Scene, manager::ManagedScene},
-    },
-    util::{assets::assetpool::AssetPool, settings::window::WindowDescriptor},
-    window::Window,
+    }, util::{assets::{ManagedResource, assetpool::AssetPool}, settings::window::WindowDescriptor}, window::Window,
 };
 
 struct Handler;
 
 impl WindowHandler for Handler
 {
-    fn textures() -> &'static [(&'static str, &'static [u8])]
+    fn textures() -> impl IntoIterator<Item = (&'static str, ManagedResource<&'static [u8]>)>
     where
         Self: Sized,
     {
-        &[("grass", include_bytes!("../assets/images/grass.png"))]
+        [("grass", ManagedResource::eager(&include_bytes!("../assets/images/grass.png")[..]))]
     }
 
-    fn sounds() -> &'static [(&'static str, &'static [u8])]
+    fn sounds() -> impl IntoIterator<Item = (&'static str, ManagedResource<&'static [u8]>)>
     where
         Self: Sized,
     {
-        &[]
+        []
     }
 
     fn scenes(
         &mut self,
         dims: (f32, f32),
-        assetpool: &AssetPool,
+        assetpool: &mut AssetPool,
     ) -> impl IntoIterator<Item = (&'static str, ManagedScene)>
     {
         let texture = assetpool.get_texture("grass").unwrap();

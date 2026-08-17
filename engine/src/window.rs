@@ -1,9 +1,8 @@
 use std::{cell::RefCell, rc::Rc, sync::Arc};
 
-use log::info;
+use log::{LevelFilter::Trace, info};
 use wgpu::{
-    Device, DeviceDescriptor, Features, Instance, Limits, PowerPreference, Queue, RequestAdapterOptions, Surface,
-    SurfaceConfiguration, TextureUsages,
+    CurrentSurfaceTexture, Device, DeviceDescriptor, ExperimentalFeatures, Features, Instance, Limits, MemoryHints, PowerPreference, Queue, RequestAdapterOptions, Surface, SurfaceColorSpace, SurfaceConfiguration, TextureUsages,
 };
 use winit::{
     application::ApplicationHandler,
@@ -70,17 +69,22 @@ impl RunningState
         // main tick
         let dt = self.clock.tick();
 
-        let output = match self.surface.get_current_texture()
-        {
-            Ok(texture) => texture,
-            Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) =>
-            {
+        let surface_frame = self.surface.get_current_texture();
+        let output = match surface_frame {
+            CurrentSurfaceTexture::Success(texture) => texture,
+
+            CurrentSurfaceTexture::Suboptimal(texture) => {
+                self.surface.configure(&self.device, &self.config);
+                texture
+            }
+
+            CurrentSurfaceTexture::Lost | CurrentSurfaceTexture::Outdated => {
                 self.surface.configure(&self.device, &self.config);
                 return;
             }
-            Err(e) =>
-            {
-                log::warn!("Dropped frame: {:?}", e);
+
+            status => {
+                log::warn!("Dropped frame: {:?}", status);
                 return;
             }
         };
@@ -101,7 +105,7 @@ impl RunningState
         self.renderer
             .draw(scene.objects(), &self.device, &self.queue, &view, &scene.camera);
 
-        output.present();
+        self.queue.present(output);
         self.input.borrow_mut().flush();
 
         self.window.request_redraw(); // loop
@@ -192,6 +196,7 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
             power_preference: PowerPreference::default(),
             compatible_surface: Some(&surface),
             force_fallback_adapter: false,
+            apply_limit_buckets: false,
         }))
         .expect("Failed to find viable adapter");
 
@@ -200,8 +205,10 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
                 label: None,
                 required_features: Features::empty(),
                 required_limits: Limits::default(),
-            },
-            None,
+                experimental_features: ExperimentalFeatures::disabled(),
+                memory_hints: MemoryHints::Performance,
+                trace: wgpu::Trace::Off,
+            }
         ))
         .expect("Failed to create device");
 
@@ -217,6 +224,7 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
             alpha_mode: surface_capabilities.alpha_modes[0],
             view_formats: vec![],
             desired_maximum_frame_latency: 2,
+            color_space: SurfaceColorSpace::Srgb,
         };
 
         surface.configure(&device, &config);
@@ -226,12 +234,12 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
         let renderer = Renderer::new(&device, surface_format);
         info!("Successfully init renderer");
 
-        let asset_pool = AssetPool::preloaded(
+        let mut asset_pool = AssetPool::preloaded(
             H::textures(),
             H::sounds(),
-            &device,
-            &queue,
-            &renderer.texture_bind_group_layout,
+            device.clone(),
+            queue.clone(),
+            renderer.texture_bind_group_layout.clone(),
         )
         .expect("Failed to init assetpool");
 
@@ -241,7 +249,7 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
         let scene_manager = SceneManager::preloaded(
             self.handler.scenes(
                 (self.descriptor.dims.0 as f32, self.descriptor.dims.1 as f32),
-                &asset_pool,
+                &mut asset_pool,
             ),
             H::initial_scene(),
         )

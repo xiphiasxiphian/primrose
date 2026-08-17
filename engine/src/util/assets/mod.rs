@@ -1,5 +1,3 @@
-use wgpu::core::command::QueryError::Resolve;
-
 pub mod assetpool;
 
 pub struct ManagedResource<T>(ManagedResourceInner<T>);
@@ -42,7 +40,7 @@ where
 {
     pub fn get(&mut self) -> &mut T { self.0.resolve() }
 
-    pub fn eager(scene: T) -> Self { Self(ManagedResourceInner::Resolved(scene)) }
+    pub fn eager(value: T) -> Self { Self(ManagedResourceInner::Resolved(value)) }
 
     pub fn lazy(f: Box<dyn FnOnce() -> T>) -> Self { Self(ManagedResourceInner::Lazy(f)) }
 

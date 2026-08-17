@@ -73,8 +73,8 @@ impl Renderer
 
         let pipeline_layout = device.create_pipeline_layout(&PipelineLayoutDescriptor {
             label: Some("render_pipeline_layout"),
-            bind_group_layouts: &[&camera_buffer.layout, &texture_bind_group_layout],
-            push_constant_ranges: &[],
+            bind_group_layouts: &[Some(&camera_buffer.layout), Some(&texture_bind_group_layout)],
+            immediate_size: 0,
         });
 
         let pipeline = device.create_render_pipeline(&RenderPipelineDescriptor {
@@ -82,13 +82,13 @@ impl Renderer
             layout: Some(&pipeline_layout),
             vertex: VertexState {
                 module: &shader,
-                entry_point: "vs_main",
-                buffers: &[Vertex::layout()],
+                entry_point: Some("vs_main"),
+                buffers: &[Some(Vertex::layout())],
                 compilation_options: Default::default(),
             },
             fragment: Some(FragmentState {
                 module: &shader,
-                entry_point: "fs_main",
+                entry_point: Some("fs_main"),
                 compilation_options: Default::default(),
                 targets: &[Some(wgpu::ColorTargetState {
                     format: surface_format,
@@ -116,7 +116,8 @@ impl Renderer
             },
             depth_stencil: None,
             multisample: MultisampleState::default(),
-            multiview: None,
+            multiview_mask: None,
+            cache: None,
         });
 
         Self {
@@ -162,6 +163,7 @@ impl Renderer
                 label: Some("render_pass"),
                 color_attachments: &[Some(RenderPassColorAttachment {
                     view,
+                    depth_slice: None,
                     resolve_target: None,
                     ops: Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color::BLACK),
@@ -171,6 +173,7 @@ impl Renderer
                 depth_stencil_attachment: None,
                 timestamp_writes: None,
                 occlusion_query_set: None,
+                multiview_mask: None,
             });
 
             pass.set_pipeline(&self.pipeline);
