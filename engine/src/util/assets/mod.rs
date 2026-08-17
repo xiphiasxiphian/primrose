@@ -38,7 +38,7 @@ impl<T> ManagedResourceInner<T>
 
 impl<T> ManagedResource<T>
 where
-    T: 'static
+    T: 'static,
 {
     pub fn get(&mut self) -> &mut T { self.0.resolve() }
 
@@ -50,15 +50,13 @@ where
     where
         F: FnOnce(T) -> O + 'static,
     {
-        ManagedResource(match self.0 {
-                ManagedResourceInner::Resolved(val) => ManagedResourceInner::Resolved(f(val)),
+        ManagedResource(match self.0
+        {
+            ManagedResourceInner::Resolved(val) => ManagedResourceInner::Resolved(f(val)),
 
-                ManagedResourceInner::Lazy(lazy_fn) => {
-                    ManagedResourceInner::Lazy(Box::new(move || f(lazy_fn())))
-                }
+            ManagedResourceInner::Lazy(lazy_fn) => ManagedResourceInner::Lazy(Box::new(move || f(lazy_fn()))),
 
-                ManagedResourceInner::Evaluating => ManagedResourceInner::Evaluating,
-            }
-        )
+            ManagedResourceInner::Evaluating => ManagedResourceInner::Evaluating,
+        })
     }
 }

@@ -26,10 +26,7 @@ impl Transform
         new
     }
 
-    pub fn scale(&mut self, factor: f64)
-    {
-        self.size = (self.size * factor).max(DVec2::ZERO)
-    }
+    pub fn scale(&mut self, factor: f64) { self.size = (self.size * factor).max(DVec2::ZERO) }
 
     pub fn stretched(&self, x_factor: f64, y_factor: f64) -> Self
     {
@@ -67,7 +64,8 @@ impl Anchor
             Anchor::BottomLeft => (x, y - h),
             Anchor::BottomRight => (x - w, y - h),
             Anchor::Center => (x - (w / 2.0), y - (h / 2.0)),
-        }.into()
+        }
+        .into()
     }
 
     pub fn to_anchor(self, target: Self, old_pos: Position, size @ Size { x: w, y: h }: Size) -> Position
@@ -80,6 +78,7 @@ impl Anchor
             Anchor::BottomLeft => (x, y + h),
             Anchor::BottomRight => (x + w, y + h),
             Anchor::Center => (x + (w / 2.0), y + (h / 2.0)),
-        }.into()
+        }
+        .into()
     }
 }

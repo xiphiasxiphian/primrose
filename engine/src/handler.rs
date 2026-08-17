@@ -1,7 +1,4 @@
-use crate::{
-    jade::scene::manager::ManagedScene,
-    util::assets::assetpool::AssetPool,
-};
+use crate::{jade::scene::manager::ManagedScene, util::assets::assetpool::AssetPool};
 
 pub trait WindowHandler: 'static
 {

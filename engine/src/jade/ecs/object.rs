@@ -65,7 +65,9 @@ impl Object
 
     pub fn get_component<C: Component>(&self) -> Option<&C>
     {
-        self.components.iter().find_map(|x| (x.as_ref() as &dyn Any).downcast_ref::<C>())
+        self.components
+            .iter()
+            .find_map(|x| (x.as_ref() as &dyn Any).downcast_ref::<C>())
     }
 
     pub fn get_component_mut<C: Component>(&mut self) -> Option<&mut C>
