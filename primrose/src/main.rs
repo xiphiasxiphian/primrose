@@ -1,3 +1,5 @@
+mod double_pendulum;
+
 use std::iter;
 
 use engine::{
