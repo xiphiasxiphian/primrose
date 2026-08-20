@@ -1,4 +1,4 @@
-use std::{any::Any, mem};
+use std::{any::Any, cell::{Ref, RefCell}, mem, ops::Deref, rc::Rc, sync::Arc};
 
 use crate::{
     jade::ecs::{
@@ -9,13 +9,16 @@ use crate::{
     util::assets::assetpool::TextureAsset,
 };
 
+pub type BoundComponent = Rc<RefCell<dyn Component>>;
+pub type DefinedComponent<T: Component> = Rc<RefCell<T>>;
+
 #[derive(Default)]
 pub struct Object
 {
     pub name: String,
     pub transform: Transform,
     z_index: ZIndex,
-    components: Vec<Box<dyn Component>>,
+    components: Vec<BoundComponent>,
     started: bool,
     texture: Option<TextureAsset>,
 }
@@ -45,39 +48,31 @@ impl Object
 
     pub fn with_component<C: Component>(mut self, component: C) -> Self
     {
-        self.components.push(Box::new(component));
-        self
-    }
-
-    pub fn with_components<I>(mut self, components: I) -> Self
-    where
-        I: IntoIterator<Item = Box<dyn Component>>,
-    {
-        self.components.extend(components);
+        self.components.push(Rc::new(RefCell::new(component)));
         self
     }
 
     pub fn add_component<C: Component>(&mut self, component: C) -> &mut Self
     {
-        self.components.push(Box::new(component));
+        self.components.push(Rc::new(RefCell::new(component)));
         self
     }
 
-    pub fn get_component<C: Component>(&self) -> Option<&C>
+    pub fn get_component_ref<C: Component>(&self) -> Option<&C>
     {
         self.components
             .iter()
-            .find_map(|x| (x.as_ref() as &dyn Any).downcast_ref::<C>())
+            .find_map(|x| (x as &dyn Any).downcast_ref::<C>())
     }
 
     pub fn get_component_mut<C: Component>(&mut self) -> Option<&mut C>
     {
         self.components
             .iter_mut()
-            .find_map(|x| (x.as_mut() as &mut dyn Any).downcast_mut::<C>())
+            .find_map(|x| (x as &mut dyn Any).downcast_mut::<C>())
     }
 
-    pub fn has_component<C: Component>(&self) -> bool { self.get_component::<C>().is_some() }
+    // pub fn has_component<C: Component>(&self) -> bool { self.get_component::<C>().is_some() }
 
     pub fn start(&mut self, ctx: &mut ComponentContext)
     {
@@ -89,7 +84,7 @@ impl Object
         let mut components = mem::take(&mut self.components);
         for component in &mut components
         {
-            component.start(self, ctx);
+            component.borrow_mut().start(self, ctx);
         }
 
         self.components = components;
@@ -101,7 +96,7 @@ impl Object
         let mut components = mem::take(&mut self.components);
         for component in &mut components
         {
-            component.tick(self, ctx, dt);
+            component.borrow_mut().tick(self, ctx, dt);
         }
 
         self.components = components;
