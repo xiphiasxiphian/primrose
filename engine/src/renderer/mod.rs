@@ -20,6 +20,7 @@ pub mod camera_uniform;
 pub mod mesh;
 pub mod texture;
 pub mod vertex;
+pub mod primitive;
 
 pub type ZIndex = i32;
 

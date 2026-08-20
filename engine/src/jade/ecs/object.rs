@@ -10,7 +10,7 @@ use crate::{
 };
 
 pub type BoundComponent = Rc<RefCell<dyn Component>>;
-pub type DefinedComponent<T: Component> = Rc<RefCell<T>>;
+pub type DefinedComponent<T> = Rc<RefCell<T>>;
 
 #[derive(Default)]
 pub struct Object
