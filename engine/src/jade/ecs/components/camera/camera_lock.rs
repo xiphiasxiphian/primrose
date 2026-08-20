@@ -1,4 +1,3 @@
-
 use glam::Vec2;
 
 use crate::jade::ecs::{

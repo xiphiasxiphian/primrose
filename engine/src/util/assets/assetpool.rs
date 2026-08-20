@@ -29,8 +29,15 @@ impl AssetPool
     {
         let mut pool = Self::default();
 
-        let default_texture = Arc::new(Texture::from_bytes(include_bytes!("../../../assets/images/default.png"), &device, &queue, &layout)?);
-        let default_sound = StaticSoundData::from_cursor(std::io::Cursor::new(include_bytes!("../../../assets/sounds/default.wav")))?;
+        let default_texture = Arc::new(Texture::from_bytes(
+            include_bytes!("../../../assets/images/default.png"),
+            &device,
+            &queue,
+            &layout,
+        )?);
+        let default_sound = StaticSoundData::from_cursor(std::io::Cursor::new(include_bytes!(
+            "../../../assets/sounds/default.wav"
+        )))?;
 
         for (name, bytes_resource) in textures
         {
