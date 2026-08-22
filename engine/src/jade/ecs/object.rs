@@ -4,11 +4,8 @@ use std::{
 
 use crate::{
     jade::ecs::{
-        component::{Component, ComponentContext},
-        transform::Transform,
-    },
-    renderer::{Renderable, ZIndex, mesh::Mesh},
-    util::assets::assetpool::TextureAsset,
+        component::{Component, ComponentContext}, components::canvas::Canvas, transform::Transform,
+    }, renderer::{Renderable, ZIndex, mesh::Mesh, primitive::draw_command::DrawCommand}, util::assets::assetpool::TextureAsset,
 };
 
 pub type BoundComponent = Rc<RefCell<dyn Component>>;
@@ -118,4 +115,10 @@ impl Renderable for Object
     }
 
     fn z_index(&self) -> ZIndex { self.z_index }
+
+    fn draw_commands(&self) -> &[DrawCommand]
+    {
+        self.get_component_ref::<Canvas>()
+            .map_or(&[], |x| x.commands())
+    }
 }

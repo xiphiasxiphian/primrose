@@ -26,6 +26,7 @@ pub trait Renderable
 {
     fn mesh(&self) -> Mesh;
     fn texture(&self) -> Option<&TextureAsset>;
+    fn draw_commands(&self) -> &[DrawCommand];
     fn z_index(&self) -> ZIndex;
 }
 
@@ -163,7 +164,7 @@ impl Renderer
                 .1
                 .push(&mesh.vertices, &indices, z);
 
-            // special case for Canvas component
+            draw_commands.extend_from_slice(renderable.draw_commands());
         }
 
         let mut encoder = device.create_command_encoder(&CommandEncoderDescriptor {
@@ -206,7 +207,7 @@ impl Renderer
             }
 
             self.primitive_pipeline.draw(
-                &[], // TODO
+                &draw_commands,
                 queue,
                 &mut pass,
                 &self.camera_buffer.bind_group,
