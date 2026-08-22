@@ -1,11 +1,21 @@
 use std::{
-    any::{Any, TypeId}, cell::{Ref, RefCell}, collections::HashMap, mem, ops::Deref, rc::Rc, sync::Arc,
+    any::{Any, TypeId},
+    cell::{Ref, RefCell},
+    collections::HashMap,
+    mem,
+    ops::Deref,
+    rc::Rc,
+    sync::Arc,
 };
 
 use crate::{
     jade::ecs::{
-        component::{Component, ComponentContext}, components::canvas::Canvas, transform::Transform,
-    }, renderer::{Renderable, ZIndex, mesh::Mesh, primitive::draw_command::DrawCommand}, util::assets::assetpool::TextureAsset,
+        component::{Component, ComponentContext},
+        components::canvas::Canvas,
+        transform::Transform,
+    },
+    renderer::{Renderable, ZIndex, mesh::Mesh, primitive::draw_command::DrawCommand},
+    util::assets::assetpool::TextureAsset,
 };
 
 pub type BoundComponent = Rc<RefCell<dyn Component>>;
@@ -47,19 +57,23 @@ impl Object
 
     pub fn with_component<C: Component>(mut self, component: C) -> Self
     {
-        self.components.insert(TypeId::of::<C>(), Rc::new(RefCell::new(component)));
+        self.components
+            .insert(TypeId::of::<C>(), Rc::new(RefCell::new(component)));
         self
     }
 
     pub fn add_component<C: Component>(&mut self, component: C) -> &mut Self
     {
-        self.components.insert(TypeId::of::<C>(), Rc::new(RefCell::new(component)));
+        self.components
+            .insert(TypeId::of::<C>(), Rc::new(RefCell::new(component)));
         self
     }
 
     pub fn get_component_ref<C: Component>(&self) -> Option<&C>
     {
-        self.components.get(&TypeId::of::<C>()).and_then(|x| (x as &dyn Any).downcast_ref::<C>())
+        self.components
+            .get(&TypeId::of::<C>())
+            .and_then(|x| (x as &dyn Any).downcast_ref::<C>())
     }
 
     pub fn get_component_mut<C: Component>(&mut self) -> Option<&mut C>
@@ -116,9 +130,5 @@ impl Renderable for Object
 
     fn z_index(&self) -> ZIndex { self.z_index }
 
-    fn draw_commands(&self) -> &[DrawCommand]
-    {
-        self.get_component_ref::<Canvas>()
-            .map_or(&[], |x| x.commands())
-    }
+    fn draw_commands(&self) -> &[DrawCommand] { self.get_component_ref::<Canvas>().map_or(&[], |x| x.commands()) }
 }

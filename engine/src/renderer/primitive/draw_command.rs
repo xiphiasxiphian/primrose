@@ -33,8 +33,18 @@ impl DrawCommand
     {
         match self
         {
-            Self::Line { start, end, thickness, color } => Self::tessellate_line(verts, indices, start, end, thickness, color),
-            Self::Circle { center, radius, color, segments } => Self::tessellate_circle(verts, indices, center, radius, color, segments),
+            Self::Line {
+                start,
+                end,
+                thickness,
+                color,
+            } => Self::tessellate_line(verts, indices, start, end, thickness, color),
+            Self::Circle {
+                center,
+                radius,
+                color,
+                segments,
+            } => Self::tessellate_circle(verts, indices, center, radius, color, segments),
             Self::FilledRect { pos, size, color } => Self::tessellate_rect(verts, indices, pos, size, color),
         }
     }
@@ -48,7 +58,11 @@ impl DrawCommand
         color: Color,
     )
     {
-        let Some(dir) = (end - start).try_normalize() else { return };
+        let Some(dir) = (end - start).try_normalize()
+        else
+        {
+            return;
+        };
         let nvec = dir.perp() * (thickness * 0.5);
 
         let base = verts.len() as u32;
@@ -99,29 +113,19 @@ impl DrawCommand
             }
         }));
 
-        indices.extend((0..segments).flat_map(|i| {
-            [base, base + 1 + i, base + 2 + i]
-        }));
+        indices.extend((0..segments).flat_map(|i| [base, base + 1 + i, base + 2 + i]));
     }
 
-    fn tessellate_rect(
-        verts: &mut Vec<ColoredVertex>,
-        indices: &mut Vec<u32>,
-        pos: DVec2,
-        size: DVec2,
-        color: Color,
-    )
+    fn tessellate_rect(verts: &mut Vec<ColoredVertex>, indices: &mut Vec<u32>, pos: DVec2, size: DVec2, color: Color)
     {
         let base = verts.len() as u32;
 
-        verts.extend_from_slice(&[
-                pos,
-                pos + size * DVec2::X,
-                pos + size,
-                pos + size * DVec2::Y,
-            ].map(|x| {
-                ColoredVertex { position: x.as_vec2().to_array(), color }
-            }));
+        verts.extend_from_slice(
+            &[pos, pos + size * DVec2::X, pos + size, pos + size * DVec2::Y].map(|x| ColoredVertex {
+                position: x.as_vec2().to_array(),
+                color,
+            }),
+        );
 
         indices.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
     }

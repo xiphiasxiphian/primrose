@@ -9,7 +9,16 @@ use wgpu::{
 };
 
 use crate::{
-    jade::{camera::Camera, ecs::object::Object}, renderer::{batch::TextureBatch, camera_uniform::CameraBuffer, mesh::Mesh, primitive::{PrimitivePipeline, draw_command::DrawCommand}, texture::Texture, vertex::Vertex}, util::assets::assetpool::TextureAsset,
+    jade::{camera::Camera, ecs::object::Object},
+    renderer::{
+        batch::TextureBatch,
+        camera_uniform::CameraBuffer,
+        mesh::Mesh,
+        primitive::{PrimitivePipeline, draw_command::DrawCommand},
+        texture::Texture,
+        vertex::Vertex,
+    },
+    util::assets::assetpool::TextureAsset,
 };
 
 pub mod batch;
@@ -37,7 +46,6 @@ pub struct Renderer
     pipeline: RenderPipeline,
 
     primitive_pipeline: PrimitivePipeline,
-
 
     // TODO: right now this works because the assetpool ensures the pointers are constant,
     // however it feels slightly dodgy
@@ -123,11 +131,7 @@ impl Renderer
             cache: None,
         });
 
-        let primitive_pipeline = PrimitivePipeline::new(
-            &device,
-            &surface_format,
-            &camera_buffer.layout,
-        );
+        let primitive_pipeline = PrimitivePipeline::new(&device, &surface_format, &camera_buffer.layout);
 
         Self {
             texture_bind_group_layout,
@@ -206,12 +210,8 @@ impl Renderer
                 pass.draw_indexed(0..slice.0, 0, 0..1);
             }
 
-            self.primitive_pipeline.draw(
-                &draw_commands,
-                queue,
-                &mut pass,
-                &self.camera_buffer.bind_group,
-            );
+            self.primitive_pipeline
+                .draw(&draw_commands, queue, &mut pass, &self.camera_buffer.bind_group);
         }
 
         queue.submit(std::iter::once(encoder.finish()));
