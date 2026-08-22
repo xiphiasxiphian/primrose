@@ -3,3 +3,5 @@ pub mod camera
 {
     pub mod camera_lock;
 }
+
+pub mod canvas;

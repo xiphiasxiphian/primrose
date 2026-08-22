@@ -1,9 +1,14 @@
-use wgpu::{BindGroup, BindGroupLayout, BlendState, Buffer, BufferDescriptor, BufferUsages, ColorTargetState, ColorWrites, Device, FragmentState, IndexFormat, PipelineLayoutDescriptor, PrimitiveState, PrimitiveTopology, Queue, RenderPass, RenderPipeline, RenderPipelineDescriptor, TextureFormat, VertexState, include_wgsl, wgc::validation::shader_io_deductions};
+use wgpu::{
+    BindGroup, BindGroupLayout, BlendState, Buffer, BufferDescriptor, BufferUsages, ColorTargetState, ColorWrites,
+    Device, FragmentState, IndexFormat, PipelineLayoutDescriptor, PrimitiveState, PrimitiveTopology, Queue, RenderPass,
+    RenderPipeline, RenderPipelineDescriptor, TextureFormat, VertexState, include_wgsl,
+    wgc::validation::shader_io_deductions,
+};
 
 use crate::renderer::primitive::{draw_command::DrawCommand, vertex::ColoredVertex};
 
-mod vertex;
 pub mod draw_command;
+mod vertex;
 
 pub struct PrimitivePipeline
 {
@@ -19,11 +24,7 @@ impl PrimitivePipeline
     const MAX_VERTICES: usize = 64 * 1024;
     const MAX_INDICES: usize = 96 * 1024;
 
-    pub fn new(
-        device: &Device,
-        surface_format: TextureFormat,
-        camera_layout: &BindGroupLayout,
-    ) -> Self
+    pub fn new(device: &Device, surface_format: &TextureFormat, camera_layout: &BindGroupLayout) -> Self
     {
         let shader = device.create_shader_module(include_wgsl!("../../../assets/shaders/shader.wgsl"));
 
@@ -47,7 +48,7 @@ impl PrimitivePipeline
                 entry_point: Some("fs_main"),
                 compilation_options: Default::default(),
                 targets: &[Some(ColorTargetState {
-                    format: surface_format,
+                    format: *surface_format,
                     blend: Some(BlendState::ALPHA_BLENDING),
                     write_mask: ColorWrites::ALL,
                 })],
@@ -85,13 +86,7 @@ impl PrimitivePipeline
         }
     }
 
-    pub fn draw(
-        &self,
-        commands: &[DrawCommand],
-        queue: &Queue,
-        pass: &mut RenderPass,
-        camera_bg: &BindGroup,
-    )
+    pub fn draw(&self, commands: &[DrawCommand], queue: &Queue, pass: &mut RenderPass, camera_bg: &BindGroup)
     {
         let (verts, indices) = commands.iter().fold(
             (Vec::<ColoredVertex>::new(), Vec::<u32>::new()),
@@ -101,7 +96,10 @@ impl PrimitivePipeline
             },
         );
 
-        if verts.is_empty() { return; }
+        if verts.is_empty()
+        {
+            return;
+        }
 
         queue.write_buffer(&self.vertex_buffer, 0, bytemuck::cast_slice(&verts));
         queue.write_buffer(&self.index_buffer, 0, bytemuck::cast_slice(&indices));

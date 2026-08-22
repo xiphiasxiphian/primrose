@@ -9,18 +9,16 @@ use wgpu::{
 };
 
 use crate::{
-    jade::{camera::Camera, ecs::object::Object},
-    renderer::{batch::TextureBatch, camera_uniform::CameraBuffer, mesh::Mesh, texture::Texture, vertex::Vertex},
-    util::assets::assetpool::TextureAsset,
+    jade::{camera::Camera, ecs::object::Object}, renderer::{batch::TextureBatch, camera_uniform::CameraBuffer, mesh::Mesh, primitive::{PrimitivePipeline, draw_command::DrawCommand}, texture::Texture, vertex::Vertex}, util::assets::assetpool::TextureAsset,
 };
 
 pub mod batch;
 pub mod bufferpool;
 pub mod camera_uniform;
 pub mod mesh;
+pub mod primitive;
 pub mod texture;
 pub mod vertex;
-pub mod primitive;
 
 pub type ZIndex = i32;
 
@@ -36,6 +34,9 @@ pub struct Renderer
     pub texture_bind_group_layout: BindGroupLayout,
     pub camera_buffer: CameraBuffer,
     pipeline: RenderPipeline,
+
+    primitive_pipeline: PrimitivePipeline,
+
 
     // TODO: right now this works because the assetpool ensures the pointers are constant,
     // however it feels slightly dodgy
@@ -121,10 +122,17 @@ impl Renderer
             cache: None,
         });
 
+        let primitive_pipeline = PrimitivePipeline::new(
+            &device,
+            &surface_format,
+            &camera_buffer.layout,
+        );
+
         Self {
             texture_bind_group_layout,
             camera_buffer,
             pipeline,
+            primitive_pipeline,
             batches: HashMap::new(),
         }
     }
@@ -132,6 +140,7 @@ impl Renderer
     pub fn draw(&mut self, renderables: &[Object], device: &Device, queue: &Queue, view: &TextureView, camera: &Camera)
     {
         self.camera_buffer.update(queue, camera);
+        let mut draw_commands: Vec<DrawCommand> = vec![];
 
         for renderable in renderables
         {
@@ -153,6 +162,8 @@ impl Renderer
                 .or_insert_with(|| (Arc::clone(texture), TextureBatch::new(device)))
                 .1
                 .push(&mesh.vertices, &indices, z);
+
+            // special case for Canvas component
         }
 
         let mut encoder = device.create_command_encoder(&CommandEncoderDescriptor {
@@ -193,6 +204,13 @@ impl Renderer
                 pass.set_index_buffer(batch.pool.index_buffer(), IndexFormat::Uint32);
                 pass.draw_indexed(0..slice.0, 0, 0..1);
             }
+
+            self.primitive_pipeline.draw(
+                &[], // TODO
+                queue,
+                &mut pass,
+                &self.camera_buffer.bind_group,
+            );
         }
 
         queue.submit(std::iter::once(encoder.finish()));
