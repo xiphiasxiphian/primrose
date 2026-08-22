@@ -2,7 +2,7 @@ use glam::DVec2;
 
 use crate::renderer::primitive::vertex::ColoredVertex;
 
-type Color = [f32; 4];
+pub type Color = [f32; 4];
 
 #[derive(Clone, Copy, Debug)]
 pub enum DrawCommand
