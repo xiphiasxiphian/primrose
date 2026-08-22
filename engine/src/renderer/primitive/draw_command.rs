@@ -1,4 +1,4 @@
-use glam::{DVec2, Vec2};
+use glam::DVec2;
 
 use crate::renderer::primitive::vertex::ColoredVertex;
 

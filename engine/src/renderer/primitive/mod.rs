@@ -2,7 +2,6 @@ use wgpu::{
     BindGroup, BindGroupLayout, BlendState, Buffer, BufferDescriptor, BufferUsages, ColorTargetState, ColorWrites,
     Device, FragmentState, IndexFormat, PipelineLayoutDescriptor, PrimitiveState, PrimitiveTopology, Queue, RenderPass,
     RenderPipeline, RenderPipelineDescriptor, TextureFormat, VertexState, include_wgsl,
-    wgc::validation::shader_io_deductions,
 };
 
 use crate::renderer::primitive::{draw_command::DrawCommand, vertex::ColoredVertex};
