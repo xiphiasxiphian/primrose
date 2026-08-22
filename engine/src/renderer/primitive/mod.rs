@@ -25,7 +25,7 @@ impl PrimitivePipeline
 
     pub fn new(device: &Device, surface_format: &TextureFormat, camera_layout: &BindGroupLayout) -> Self
     {
-        let shader = device.create_shader_module(include_wgsl!("../../../assets/shaders/shader.wgsl"));
+        let shader = device.create_shader_module(include_wgsl!("../../../assets/shaders/primitive.wgsl"));
 
         let pipeline_layout = device.create_pipeline_layout(&PipelineLayoutDescriptor {
             label: Some("primitive_pipeline_layout"),

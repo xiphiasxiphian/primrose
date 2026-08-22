@@ -20,6 +20,8 @@ use engine::{
     window::Window,
 };
 
+use crate::double_pendulum::DoublePendulum;
+
 struct Handler;
 
 impl WindowHandler for Handler
@@ -48,7 +50,7 @@ impl WindowHandler for Handler
     ) -> impl IntoIterator<Item = (&'static str, ManagedScene)>
     {
         let texture = assetpool.get_texture("grass").unwrap();
-        iter::once_with(move || {
+        [
             (
                 "base",
                 ManagedScene::eager(
@@ -74,11 +76,24 @@ impl WindowHandler for Handler
                             .with_texture(texture),
                         ),
                 ),
+            ),
+            (
+                "double_pendulum",
+                ManagedScene::eager(
+                    Scene::new(dims)
+                        .with_object(
+                            Object::new(
+                                "double_pendulum",
+                                Transform::default(),
+                            )
+                            .with_component(DoublePendulum::default())
+                        )
+                )
             )
-        })
+        ]
     }
 
-    fn initial_scene() -> &'static str { "base" }
+    fn initial_scene() -> &'static str { "double_pendulum" }
 }
 
 fn main()

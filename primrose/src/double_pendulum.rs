@@ -1,3 +1,5 @@
+use engine::{glam::DVec2, jade::ecs::{component::{Component, ComponentContext}, components::canvas::Canvas, object::Object}};
+
 #[derive(Clone, Copy, Debug)]
 pub struct State
 {
@@ -17,6 +19,26 @@ pub struct DoublePendulum
     pub m2: f64,
     pub g: f64,
     pub dampning: f64,
+}
+
+impl Default for DoublePendulum
+{
+    fn default() -> Self {
+        DoublePendulum {
+            state: State {
+                theta1: 45.0,
+                theta2: 45.0,
+                omega1: 0.0,
+                omega2: 0.0
+            },
+            l1: 6.0,
+            l2: 6.0,
+            m1: 1.0,
+            m2: 1.0,
+            g: 9.81,
+            dampning: 0.0
+        }
+    }
 }
 
 impl DoublePendulum
@@ -93,5 +115,41 @@ impl DoublePendulum
         self.state.theta2 += (dt / 6.0) * (d_th2_1 + 2.0 * d_th2_2 + 2.0 * d_th2_3 + d_th2_4);
         self.state.omega1 += (dt / 6.0) * (d_om1_1 + 2.0 * d_om1_2 + 2.0 * d_om1_3 + d_om1_4);
         self.state.omega2 += (dt / 6.0) * (d_om2_1 + 2.0 * d_om2_2 + 2.0 * d_om2_3 + d_om2_4);
+    }
+
+    pub fn get_node_positions(&self) -> (DVec2, DVec2)
+    {
+        let node1 = DVec2::new(
+            self.state.theta1.sin(),
+            self.state.theta1.cos(),
+        ) * self.l1;
+
+        let node2 = node1 + DVec2::new(
+            self.state.theta2.sin(),
+            self.state.theta2.cos(),
+        ) * self.l2;
+
+        (node1, node2)
+    }
+}
+
+impl Component for DoublePendulum
+{
+    fn tick(&mut self, parent: &mut Object, _ctx: &mut ComponentContext, dt: f64)
+    {
+        self.step(dt);
+
+        let Some(canvas) = parent.get_component_mut::<Canvas>() else { return };
+
+        let line_color = [0.0, 0.0, 1.0, 1.0];
+        let node_color = [1.0, 0.0, 0.0, 1.0];
+
+        let (node1, node2) = self.get_node_positions();
+
+        canvas.line(DVec2::ZERO, node1, 1.0, line_color);
+        canvas.circle(node1, 2.0, node_color, 64);
+
+        canvas.line(node1, node2, 1.0, line_color);
+        canvas.circle(node2, 2.0, node_color, 64);
     }
 }
