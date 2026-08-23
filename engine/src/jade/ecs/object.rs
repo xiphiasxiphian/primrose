@@ -1,9 +1,5 @@
 use std::{
-    any::{Any, TypeId},
-    cell::RefCell,
-    collections::HashMap,
-    mem,
-    rc::Rc,
+    any::{Any, TypeId}, cell::{Ref, RefCell}, collections::HashMap, mem, rc::Rc,
 };
 
 use crate::{
@@ -16,8 +12,7 @@ use crate::{
     util::assets::assetpool::TextureAsset,
 };
 
-pub type BoundComponent = Rc<RefCell<dyn Component>>;
-pub type DefinedComponent<T> = Rc<RefCell<T>>;
+pub type BoundComponent = Box<dyn Component>;
 
 #[derive(Default)]
 pub struct Object
@@ -56,29 +51,31 @@ impl Object
     pub fn with_component<C: Component>(mut self, component: C) -> Self
     {
         self.components
-            .insert(TypeId::of::<C>(), Rc::new(RefCell::new(component)));
+            .insert(TypeId::of::<C>(), Box::new(component));
         self
     }
 
     pub fn add_component<C: Component>(&mut self, component: C) -> &mut Self
     {
         self.components
-            .insert(TypeId::of::<C>(), Rc::new(RefCell::new(component)));
+            .insert(TypeId::of::<C>(), Box::new(component));
         self
     }
 
     pub fn get_component_ref<C: Component>(&self) -> Option<&C>
     {
+        log::debug!("{:?}", self.components.keys());
         self.components
             .get(&TypeId::of::<C>())
-            .and_then(|x| (x as &dyn Any).downcast_ref::<C>())
+            .and_then(|x| (x.as_ref() as &dyn Any).downcast_ref::<C>())
     }
 
     pub fn get_component_mut<C: Component>(&mut self) -> Option<&mut C>
     {
+        log::debug!("{:?}", self.components.keys());
         self.components
             .get_mut(&TypeId::of::<C>())
-            .and_then(|x| (x as &mut dyn Any).downcast_mut::<C>())
+            .and_then(|x| (x.as_mut() as &mut dyn Any).downcast_mut::<C>())
     }
 
     // pub fn has_component<C: Component>(&self) -> bool { self.get_component::<C>().is_some() }
@@ -93,7 +90,7 @@ impl Object
         let mut components = mem::take(&mut self.components);
         for component in components.values_mut()
         {
-            component.borrow_mut().start(self, ctx);
+            component.start(self, ctx);
         }
 
         self.components = components;
@@ -102,13 +99,10 @@ impl Object
 
     pub fn tick(&mut self, ctx: &mut ComponentContext, dt: f64)
     {
-        let mut components = mem::take(&mut self.components);
-        for component in components.values_mut()
+        for component in self.components.values_mut()
         {
-            component.borrow_mut().tick(self, ctx, dt);
+            component.tick(self, ctx, dt);
         }
-
-        self.components = components;
     }
 }
 
@@ -128,5 +122,11 @@ impl Renderable for Object
 
     fn z_index(&self) -> ZIndex { self.z_index }
 
-    fn draw_commands(&self) -> &[DrawCommand] { self.get_component_ref::<Canvas>().map_or(&[], |x| x.commands()) }
+    fn draw_commands(&self) -> &[DrawCommand]
+    {
+        self.get_component_ref::<Canvas>().map_or_else(|| {
+            log::warn!("Failed to find canvas when requesting draw commands");
+            [].as_slice()
+        }, |x| x.commands())
+    }
 }

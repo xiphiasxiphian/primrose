@@ -139,7 +139,7 @@ impl Component for DoublePendulum
     {
         self.step(dt);
 
-        let Some(canvas) = parent.get_component_mut::<Canvas>() else { return };
+        let Some(canvas) = parent.get_component_mut::<Canvas>() else { log::warn!("Failed to get mutable canvas"); return };
 
         let line_color = [0.0, 0.0, 1.0, 1.0];
         let node_color = [1.0, 0.0, 0.0, 1.0];
@@ -151,5 +151,7 @@ impl Component for DoublePendulum
 
         canvas.line(node1, node2, 1.0, line_color);
         canvas.circle(node2, 2.0, node_color, 64);
+
+        log::debug!("{:?}", canvas.commands());
     }
 }

@@ -149,6 +149,8 @@ impl Renderer
 
         for renderable in renderables
         {
+            draw_commands.extend_from_slice(renderable.draw_commands());
+
             let mesh = renderable.mesh();
             let Some(texture) = renderable.texture()
             else
@@ -167,8 +169,6 @@ impl Renderer
                 .or_insert_with(|| (Arc::clone(texture), TextureBatch::new(device)))
                 .1
                 .push(&mesh.vertices, &indices, z);
-
-            draw_commands.extend_from_slice(renderable.draw_commands());
         }
 
         let mut encoder = device.create_command_encoder(&CommandEncoderDescriptor {
@@ -209,6 +209,8 @@ impl Renderer
                 pass.set_index_buffer(batch.pool.index_buffer(), IndexFormat::Uint32);
                 pass.draw_indexed(0..slice.0, 0, 0..1);
             }
+
+            log::debug!("{:?}", &draw_commands);
 
             self.primitive_pipeline
                 .draw(&draw_commands, queue, &mut pass, &self.camera_buffer.bind_group);

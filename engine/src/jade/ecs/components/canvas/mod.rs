@@ -2,6 +2,7 @@ use glam::DVec2;
 
 use crate::{jade::ecs::component::Component, renderer::primitive::draw_command::{Color, DrawCommand}};
 
+#[derive(Debug, Default)]
 pub struct Canvas
 {
     draw_commands: Vec<DrawCommand>,
@@ -9,7 +10,11 @@ pub struct Canvas
 
 impl Canvas
 {
-    pub fn commands(&self) -> &[DrawCommand] { &self.draw_commands }
+    pub fn commands(&self) -> &[DrawCommand]
+    {
+        log::debug!("{:?}", &self.draw_commands);
+        &self.draw_commands
+    }
 
 
     // temp for now. gonna make the api a whole lot nicer to use in the future

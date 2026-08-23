@@ -3,21 +3,14 @@ mod double_pendulum;
 use std::iter;
 
 use engine::{
-    glam::DVec2,
-    handler::WindowHandler,
-    jade::{
+    glam::DVec2, handler::WindowHandler, jade::{
         ecs::{
-            components::{basic_controller::PlayerController, camera::camera_lock::CameraLock},
-            object::Object,
-            transform::{Anchor, Transform},
-        },
-        scene::{Scene, manager::ManagedScene},
-    },
-    util::{
+            components::{basic_controller::PlayerController, camera::camera_lock::CameraLock, canvas::Canvas}, object::Object, transform::{Anchor, Transform},
+        }, scene::{Scene, manager::ManagedScene},
+    }, util::{
         assets::{ManagedResource, assetpool::AssetPool},
         settings::window::WindowDescriptor,
-    },
-    window::Window,
+    }, window::Window,
 };
 
 use crate::double_pendulum::DoublePendulum;
@@ -86,6 +79,7 @@ impl WindowHandler for Handler
                                 "double_pendulum",
                                 Transform::default(),
                             )
+                            .with_component(Canvas::default())
                             .with_component(DoublePendulum::default())
                         )
                 )
