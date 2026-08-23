@@ -1,21 +1,46 @@
-use std::any::Any;
+use std::{any::{Any, TypeId}, collections::HashMap};
 
-use crate::{
-    jade::{audio::SoundHandler, camera::Camera, ecs::object::Object, input::InputState},
-    util::assets::assetpool::AssetPool,
-};
+use crate::jade::ecs::entity::Entity;
 
-pub trait Component: Any
+pub trait Component: Any + 'static {}
+
+struct Column
 {
-    fn start(&mut self, _parent: &mut Object, _ctx: &mut ComponentContext) {}
-
-    fn tick(&mut self, _parent: &mut Object, _ctx: &mut ComponentContext, _dt: f64) {}
+    data: Vec<Box<dyn Any>>,
+    type_id: TypeId,
 }
 
-pub struct ComponentContext<'a>
+pub struct Archetype
 {
-    pub input: &'a InputState,
-    pub assetpool: &'a AssetPool,
-    pub camera: &'a mut Camera,
-    pub sound: &'a mut SoundHandler,
+    component_types: Vec<TypeId>,
+    entities: Vec<Entity>,
+    columns: HashMap<TypeId, Column>,
+}
+
+impl Archetype
+{
+    pub fn entities(&self) -> &[Entity] { &self.entities }
+
+    pub fn matches(&self, types: &[TypeId]) -> bool
+    {
+        types.iter().all(|t| self.component_types.contains(t))
+    }
+
+    pub fn get_entry<'a, E: 'static>(&'a self, id: &TypeId, row: usize) -> Option<&'a E>
+    {
+        self.columns.get(id)?.data.get(row)?.downcast_ref::<E>()
+    }
+
+    pub fn remove(&mut self, row: usize) -> Entity
+    {
+        let last = *self.entities.last().unwrap();
+        self.entities.swap_remove(row);
+
+        for column in self.columns.values_mut()
+        {
+            column.data.swap_remove(row);
+        }
+
+        last
+    }
 }

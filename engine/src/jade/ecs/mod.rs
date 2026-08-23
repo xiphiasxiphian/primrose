@@ -1,4 +1,4 @@
+pub mod entity;
 pub mod component;
-pub mod components;
-pub mod object;
-pub mod transform;
+pub mod world;
+pub mod query;
