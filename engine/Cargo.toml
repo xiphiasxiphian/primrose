@@ -14,3 +14,5 @@ winit    = "0.30"
 pollster = "0.3"
 strum = { version = "0.28.0", features = ["derive"] }
 thiserror = "2.0.19"
+derive_more = "2.1.1"
+derive-new = "0.7.0"

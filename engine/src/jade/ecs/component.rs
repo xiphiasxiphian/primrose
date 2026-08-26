@@ -1,6 +1,6 @@
 use std::{any::{Any, TypeId}, collections::HashMap};
 
-use crate::jade::ecs::entity::Entity;
+use crate::jade::ecs::{component, entity::Entity};
 
 pub trait Component: Any + 'static {}
 
@@ -10,6 +10,18 @@ pub struct Column
     type_id: TypeId,
 }
 
+impl Column
+{
+    pub fn new(tid: TypeId) -> Self
+    {
+        Self {
+            data: Default::default(),
+            type_id: tid,
+        }
+    }
+}
+
+#[derive(derive_new::new)]
 pub struct Archetype
 {
     component_types: Vec<TypeId>,
@@ -31,6 +43,20 @@ impl Archetype
     pub fn get_entry<'a, E: 'static>(&'a self, id: &TypeId, row: usize) -> Option<&'a E>
     {
         self.columns.get(id)?.data.get(row)?.downcast_ref::<E>()
+    }
+
+    pub fn add(&mut self, entity: Entity, components: impl IntoIterator<Item = (TypeId, Box<dyn Component>)>)
+    {
+        self.entities.push(entity);
+
+        for (type_id, component) in components
+        {
+            self.columns
+                .get_mut(&type_id)
+                .expect("Archetype missing column for type. This should be impossible")
+                .data
+                .push(component);
+        }
     }
 
     pub fn remove(&mut self, row: usize) -> Entity

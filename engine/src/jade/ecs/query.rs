@@ -41,6 +41,14 @@ impl <A: Component, B: Component> QueryParam for (&A, &B)
 
 impl <'a, T: QueryParam> Query<'a, T>
 {
+    pub fn new(world: &'a World) -> Self
+    {
+        Self {
+            world,
+            _pd: PhantomData,
+        }
+    }
+
     pub fn iter(&self) -> impl Iterator<Item = T::Item<'_>>
     {
         let type_ids = T::type_ids();

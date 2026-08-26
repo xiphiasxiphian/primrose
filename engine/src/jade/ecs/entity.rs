@@ -9,6 +9,7 @@ pub struct Entity
     generation: u32,
 }
 
+#[derive(Default, Debug)]
 pub struct EntityAllocator
 {
     generations: Vec<u32>,
@@ -72,6 +73,16 @@ impl<'a> EntityBuilder<'a>
 
     pub fn build(self) -> Entity
     {
+        let type_ids = self.components.iter().map(|&(t, _)| t);
 
+        let arch_index = self.world.find_or_create_archetype(type_ids);
+        let arch = self.world.archetype_mut(arch_index).expect("Invalid arch index acquire from world. Idiot Programmer Detected");
+        let row = arch.entities().len();
+
+        arch.add(self.entity, self.components);
+
+        self.world.entity_map_entry(entity).insert_entry((arch_index, row));
+
+        self.entity
     }
 }
