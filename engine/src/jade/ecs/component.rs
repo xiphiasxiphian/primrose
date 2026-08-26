@@ -4,7 +4,7 @@ use crate::jade::ecs::entity::Entity;
 
 pub trait Component: Any + 'static {}
 
-struct Column
+pub struct Column
 {
     data: Vec<Box<dyn Any>>,
     type_id: TypeId,
@@ -21,9 +21,11 @@ impl Archetype
 {
     pub fn entities(&self) -> &[Entity] { &self.entities }
 
-    pub fn matches(&self, types: &[TypeId]) -> bool
+    pub fn matches<'a, I>(&self, types: I) -> bool
+    where
+        I: IntoIterator<Item = &'a TypeId>
     {
-        types.iter().all(|t| self.component_types.contains(t))
+        types.into_iter().all(|t| self.component_types.contains(t))
     }
 
     pub fn get_entry<'a, E: 'static>(&'a self, id: &TypeId, row: usize) -> Option<&'a E>

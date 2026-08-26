@@ -1,3 +1,5 @@
+use std::any::TypeId;
+
 use crate::jade::ecs::{component::Component, world::World};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -48,7 +50,7 @@ pub struct EntityBuilder<'a>
 {
     world: &'a mut World,
     entity: Entity,
-    components: Vec<&'a dyn Component>,
+    components: Vec<(TypeId, Box<dyn Component>)>,
 }
 
 impl<'a> EntityBuilder<'a>
@@ -60,5 +62,16 @@ impl<'a> EntityBuilder<'a>
             entity,
             components: vec![],
         }
+    }
+
+    pub fn with_component<C: Component>(mut self, component: C) -> Self
+    {
+        self.components.push((TypeId::of::<C>(), Box::new(component)));
+        self
+    }
+
+    pub fn build(self) -> Entity
+    {
+
     }
 }
