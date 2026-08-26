@@ -2,7 +2,7 @@ pub mod manager;
 
 use crate::{
     jade::{
-        audio::SoundHandler, camera::Camera, ecs::{system::{Scheduler, Stage, System}, world::{Resource, World}}, input::InputState,
+        audio::SoundHandler, camera::Camera, ecs::{entity::EntityBuilder, system::{Scheduler, Stage, System}, world::{Resource, World}}, input::InputState,
     }, util::assets::assetpool::AssetPool,
 };
 
@@ -30,11 +30,29 @@ impl Scene
         self
     }
 
+    pub fn with_entity<F>(mut self, f: F) -> Self
+    where
+        F: FnOnce(&mut EntityBuilder<'_>)
+    {
+        let mut entity_builder = self.world.spawn();
+        f(&mut entity_builder);
+
+        entity_builder.build();
+
+        self
+    }
+
     // Wrap the scheduler functions as they are linked to the world
 
     pub fn run_stage(&mut self, stage: Stage)
     {
         self.scheduler.run_stage(stage, &mut self.world);
+    }
+
+    pub fn with_system<S: System>(mut self, stage: Stage, system: S) -> Self
+    {
+        self.scheduler.add_system(stage, system);
+        self
     }
 
     pub fn add_system<S: System>(&mut self, stage: Stage, system: S)

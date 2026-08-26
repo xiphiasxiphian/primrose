@@ -132,7 +132,7 @@ impl Renderer
         }
     }
 
-    pub fn draw(&mut self, renderables: &[Renderable], device: &Device, queue: &Queue, view: &TextureView, camera: &Camera)
+    pub fn draw<'a>(&mut self, renderables: impl IntoIterator<Item = &'a Renderable>, device: &Device, queue: &Queue, view: &TextureView, camera: &Camera)
     {
         self.camera_buffer.update(queue, camera);
         let mut draw_commands: Vec<DrawCommand> = vec![];

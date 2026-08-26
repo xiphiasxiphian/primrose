@@ -24,6 +24,20 @@ pub trait QueryParam: private::Sealed
     fn fetch<'a>(archetype: &'a Archetype, row: usize) -> Option<Self::Item<'a>>;
 }
 
+impl<A: Component> private::Sealed for &A {}
+impl<A: Component> QueryParam for &A
+{
+    type Item<'a> = &'a A;
+
+    fn type_ids() -> Vec<TypeId> { vec![TypeId::of::<A>()] }
+
+    fn fetch<'a>(archetype: &'a Archetype, row: usize) -> Option<Self::Item<'a>>
+    {
+        let a = archetype.get_entry(&TypeId::of::<A>(), row)?;
+        Some(a)
+    }
+}
+
 impl<A: Component, B: Component> private::Sealed for (&A, &B) {}
 impl<A: Component, B: Component> QueryParam for (&A, &B)
 {

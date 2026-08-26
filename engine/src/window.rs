@@ -14,15 +14,9 @@ use winit::{
 };
 
 use crate::{
-    clock::Clock,
-    handler::WindowHandler,
-    jade::{
-        audio::SoundHandler,
-        input::InputState,
-        scene::{ComponentContextIn, manager::SceneManager},
-    },
-    renderer::Renderer,
-    util::{
+    clock::Clock, handler::WindowHandler, jade::{
+        audio::SoundHandler, ecs::{components::renderable::Renderable, system::Stage}, input::InputState, scene::manager::SceneManager,
+    }, renderer::Renderer, util::{
         assets::assetpool::AssetPool,
         settings::window::{FullscreenOptions, WindowDescriptor},
     },
@@ -51,24 +45,26 @@ impl RunningState
     fn draw(&mut self)
     {
         let scene = self.scene_manager.current_scene_mut();
+        scene.run_stage(Stage::PreUpdate);
 
-        // scene init
-        if !self.started
-        {
-            {
-                let input = self.input.borrow();
-                scene.start(&mut ComponentContextIn {
-                    input: &input,
-                    assetpool: &self.asset_pool,
-                    sound: &mut self.sound_handler,
-                });
-            }
+        // // scene init
+        // if !self.started
+        // {
+        //     {
+        //         let input = self.input.borrow();
+        //         scene.start(&mut ComponentContextIn {
+        //             input: &input,
+        //             assetpool: &self.asset_pool,
+        //             sound: &mut self.sound_handler,
+        //         });
+        //     }
 
-            self.started = true;
-        }
+        //     self.started = true;
+        // }
 
         // main tick
         let dt = self.clock.tick();
+        scene.run_stage(Stage::Update);
 
         let surface_frame = self.surface.get_current_texture();
         let output = match surface_frame
@@ -94,21 +90,13 @@ impl RunningState
             }
         };
 
-        {
-            let input = self.input.borrow();
-            scene.tick(
-                &mut ComponentContextIn {
-                    input: &input,
-                    assetpool: &self.asset_pool,
-                    sound: &mut self.sound_handler,
-                },
-                dt,
-            );
-        }
+        scene.run_stage(Stage::PostUpdate);
 
         let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
         self.renderer
-            .draw(scene.objects(), &self.device, &self.queue, &view, &scene.camera);
+            .draw(scene.world.query::<&Renderable>().iter(), &self.device, &self.queue, &view, &scene.camera);
+
+        scene.run_stage(Stage::PreRender);
 
         self.queue.present(output);
         self.input.borrow_mut().flush();
