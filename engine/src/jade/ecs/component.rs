@@ -1,4 +1,7 @@
-use std::{any::{Any, TypeId}, collections::HashMap};
+use std::{
+    any::{Any, TypeId},
+    collections::HashMap,
+};
 
 use crate::jade::ecs::{component, entity::Entity};
 
@@ -35,7 +38,7 @@ impl Archetype
 
     pub fn matches<'a, I>(&self, types: I) -> bool
     where
-        I: IntoIterator<Item = &'a TypeId>
+        I: IntoIterator<Item = &'a TypeId>,
     {
         types.into_iter().all(|t| self.component_types.contains(t))
     }

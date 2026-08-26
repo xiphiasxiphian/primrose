@@ -1,6 +1,13 @@
-use std::{any::{Any, TypeId}, collections::{HashMap, hash_map::Entry}};
+use std::{
+    any::{Any, TypeId},
+    collections::{HashMap, hash_map::Entry},
+};
 
-use crate::jade::ecs::{component::{Archetype, Column}, entity::{Entity, EntityAllocator, EntityBuilder}, query::{Query, QueryParam}};
+use crate::jade::ecs::{
+    component::{Archetype, Column},
+    entity::{Entity, EntityAllocator, EntityBuilder},
+    query::{Query, QueryParam},
+};
 
 type EntityLoc = (usize, usize);
 
@@ -23,10 +30,7 @@ impl World
         EntityBuilder::new(self, entity)
     }
 
-    pub fn despawn(
-        &mut self,
-        entity: Entity,
-    )
+    pub fn despawn(&mut self, entity: Entity)
     {
         if let Some((arch_index, row)) = self.entity_map.remove(&entity)
         {
@@ -54,50 +58,36 @@ impl World
 
     pub fn resource<R: Resource>(&self) -> Option<&R>
     {
-        self.resources.get(&TypeId::of::<R>())
+        self.resources
+            .get(&TypeId::of::<R>())
             .and_then(|r| (r as &dyn Any).downcast_ref::<R>())
     }
 
     pub fn resource_mut<R: Resource>(&mut self) -> Option<&mut R>
     {
-        self.resources.get_mut(&TypeId::of::<R>())
+        self.resources
+            .get_mut(&TypeId::of::<R>())
             .and_then(|r| (r as &mut dyn Any).downcast_mut::<R>())
     }
 
-    pub fn archetypes_iter(&self) -> impl Iterator<Item = &Archetype>
-    {
-        self.archetypes.iter()
-    }
+    pub fn archetypes_iter(&self) -> impl Iterator<Item = &Archetype> { self.archetypes.iter() }
 
-    pub fn query<P: QueryParam>(&self) -> Query<P>
-    {
-        Query::new(self)
-    }
+    pub fn query<P: QueryParam>(&self) -> Query<P> { Query::new(self) }
 
     pub fn find_or_create_archetype<'a>(&mut self, type_ids: impl IntoIterator<Item = &'a TypeId>) -> usize
     {
-        if let Some(index) = self.archetypes.iter().position(|a| {
-            a.matches(type_ids.into_iter())
-        })
+        if let Some(index) = self.archetypes.iter().position(|a| a.matches(type_ids.into_iter()))
         {
             return index;
         }
 
-        let columns = type_ids.into_iter().map(|&tid| {
-            (tid, Column::new(tid))
-        }).collect();
+        let columns = type_ids.into_iter().map(|&tid| (tid, Column::new(tid))).collect();
 
-        self.archetypes.push(Archetype::new(
-            type_ids.into_iter.collect(),
-            vec![],
-            columns
-        ));
+        self.archetypes
+            .push(Archetype::new(type_ids.into_iter.collect(), vec![], columns));
 
         self.archetypes.len() - 1
     }
 
-    pub fn archetype_mut(&mut self, index: usize) -> Option<&mut Archetype>
-    {
-        self.archetypes.get_mut(index)
-    }
+    pub fn archetype_mut(&mut self, index: usize) -> Option<&mut Archetype> { self.archetypes.get_mut(index) }
 }

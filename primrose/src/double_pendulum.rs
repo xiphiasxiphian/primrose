@@ -1,4 +1,11 @@
-use engine::{glam::DVec2, jade::ecs::{component::{Component, ComponentContext}, components::canvas::Canvas, object::Object}};
+use engine::{
+    glam::DVec2,
+    jade::ecs::{
+        component::{Component, ComponentContext},
+        components::canvas::Canvas,
+        object::Object,
+    },
+};
 
 #[derive(Clone, Copy, Debug)]
 pub struct State
@@ -23,20 +30,21 @@ pub struct DoublePendulum
 
 impl Default for DoublePendulum
 {
-    fn default() -> Self {
+    fn default() -> Self
+    {
         DoublePendulum {
             state: State {
                 theta1: 45.0,
                 theta2: 45.0,
                 omega1: 0.0,
-                omega2: 0.0
+                omega2: 0.0,
             },
             l1: 6.0,
             l2: 6.0,
             m1: 1.0,
             m2: 1.0,
             g: 9.81,
-            dampning: 0.0
+            dampning: 0.0,
         }
     }
 }
@@ -119,15 +127,9 @@ impl DoublePendulum
 
     pub fn get_node_positions(&self) -> (DVec2, DVec2)
     {
-        let node1 = DVec2::new(
-            self.state.theta1.sin(),
-            self.state.theta1.cos(),
-        ) * self.l1;
+        let node1 = DVec2::new(self.state.theta1.sin(), self.state.theta1.cos()) * self.l1;
 
-        let node2 = node1 + DVec2::new(
-            self.state.theta2.sin(),
-            self.state.theta2.cos(),
-        ) * self.l2;
+        let node2 = node1 + DVec2::new(self.state.theta2.sin(), self.state.theta2.cos()) * self.l2;
 
         (node1, node2)
     }
@@ -139,7 +141,12 @@ impl Component for DoublePendulum
     {
         self.step(dt);
 
-        let Some(canvas) = parent.get_component_mut::<Canvas>() else { log::warn!("Failed to get mutable canvas"); return };
+        let Some(canvas) = parent.get_component_mut::<Canvas>()
+        else
+        {
+            log::warn!("Failed to get mutable canvas");
+            return;
+        };
 
         let line_color = [0.0, 0.0, 1.0, 1.0];
         let node_color = [1.0, 0.0, 0.0, 1.0];

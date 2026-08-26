@@ -22,7 +22,10 @@ impl EntityAllocator
     {
         if let Some(index) = self.free.pop()
         {
-            Entity { index, generation: self.generations[index as usize] }
+            Entity {
+                index,
+                generation: self.generations[index as usize],
+            }
         }
         else
         {
@@ -41,7 +44,8 @@ impl EntityAllocator
 
     pub fn is_alive(&self, entity: Entity) -> bool
     {
-        self.generations.get(entity.index as usize)
+        self.generations
+            .get(entity.index as usize)
             .map(|&g| g == entity.generation)
             .unwrap_or(false)
     }
@@ -76,7 +80,10 @@ impl<'a> EntityBuilder<'a>
         let type_ids = self.components.iter().map(|&(t, _)| t);
 
         let arch_index = self.world.find_or_create_archetype(type_ids);
-        let arch = self.world.archetype_mut(arch_index).expect("Invalid arch index acquire from world. Idiot Programmer Detected");
+        let arch = self
+            .world
+            .archetype_mut(arch_index)
+            .expect("Invalid arch index acquire from world. Idiot Programmer Detected");
         let row = arch.entities().len();
 
         arch.add(self.entity, self.components);

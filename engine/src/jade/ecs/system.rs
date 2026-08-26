@@ -11,12 +11,9 @@ pub trait System: 'static
 
 impl<F> System for F
 where
-    F: Fn(&mut World) + 'static
+    F: Fn(&mut World) + 'static,
 {
-    fn run(&mut self, world: &mut World)
-    {
-        (self)(world)
-    }
+    fn run(&mut self, world: &mut World) { (self)(world) }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, EnumCount)]
@@ -25,7 +22,7 @@ pub enum Stage
     PreUpdate,
     Update,
     PostUpdate,
-    PreRender
+    PreRender,
 }
 
 pub struct Scheduler
@@ -56,7 +53,11 @@ impl Scheduler
     {
         for stage in self.order
         {
-            let Some(systems) = self.stages.get_mut(stage as usize) else { continue };
+            let Some(systems) = self.stages.get_mut(stage as usize)
+            else
+            {
+                continue;
+            };
             systems.iter_mut().for_each(|x| x.run(world));
         }
     }

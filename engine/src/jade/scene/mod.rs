@@ -2,8 +2,13 @@ pub mod manager;
 
 use crate::{
     jade::{
-        audio::SoundHandler, camera::Camera, ecs::{system::Scheduler, world::World}, input::InputState,
-    }, renderer::Renderable, util::assets::assetpool::AssetPool,
+        audio::SoundHandler,
+        camera::Camera,
+        ecs::{system::Scheduler, world::World},
+        input::InputState,
+    },
+    renderer::Renderable,
+    util::assets::assetpool::AssetPool,
 };
 
 pub struct Scene
