@@ -63,7 +63,7 @@ impl RunningState
         // }
 
         // main tick
-        let dt = self.clock.tick();
+        let _dt = self.clock.tick();
         scene.run_stage(Stage::Update);
 
         let surface_frame = self.surface.get_current_texture();

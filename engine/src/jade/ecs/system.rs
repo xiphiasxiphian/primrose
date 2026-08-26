@@ -1,8 +1,7 @@
-use std::collections::HashMap;
 
 use strum::EnumCount;
 
-use crate::jade::ecs::{query::Query, world::World};
+use crate::jade::ecs::world::World;
 
 pub trait System: 'static
 {

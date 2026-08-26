@@ -1,10 +1,8 @@
 pub mod manager;
 
-use crate::{
-    jade::{
-        audio::SoundHandler, camera::Camera, ecs::{entity::EntityBuilder, system::{Scheduler, Stage, System}, world::{Resource, World}}, input::InputState,
-    }, util::assets::assetpool::AssetPool,
-};
+use crate::jade::{
+        camera::Camera, ecs::{entity::EntityBuilder, system::{Scheduler, Stage, System}, world::{Resource, World}},
+    };
 
 pub struct Scene
 {

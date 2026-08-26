@@ -24,35 +24,45 @@ pub trait QueryParam: private::Sealed
     fn fetch<'a>(archetype: &'a Archetype, row: usize) -> Option<Self::Item<'a>>;
 }
 
+macro_rules! impl_query_param_tuple {
+    ($($T:ident),+) => {
+        impl<$($T: Component),+> private::Sealed for ($(&$T,)+) {}
+
+        impl<$($T: Component),+> QueryParam for ($(&$T,)+) {
+            type Item<'a> = ($(&'a $T,)+);
+
+            fn type_ids() -> Vec<TypeId> {
+                vec![$(TypeId::of::<$T>()),+]
+            }
+
+            fn fetch<'a>(archetype: &'a Archetype, row: usize) -> Option<Self::Item<'a>> {
+                Some((
+                    $(
+                        archetype.get_entry(&TypeId::of::<$T>(), row)?,
+                    )+
+                ))
+            }
+        }
+    };
+}
+
+// Bare reference implementation (kept separate due to non-tuple type structure)
 impl<A: Component> private::Sealed for &A {}
-impl<A: Component> QueryParam for &A
-{
+impl<A: Component> QueryParam for &A {
     type Item<'a> = &'a A;
 
     fn type_ids() -> Vec<TypeId> { vec![TypeId::of::<A>()] }
 
-    fn fetch<'a>(archetype: &'a Archetype, row: usize) -> Option<Self::Item<'a>>
-    {
-        let a = archetype.get_entry(&TypeId::of::<A>(), row)?;
-        Some(a)
+    fn fetch<'a>(archetype: &'a Archetype, row: usize) -> Option<Self::Item<'a>> {
+        archetype.get_entry(&TypeId::of::<A>(), row)
     }
 }
 
-impl<A: Component, B: Component> private::Sealed for (&A, &B) {}
-impl<A: Component, B: Component> QueryParam for (&A, &B)
-{
-    type Item<'a> = (&'a A, &'a B);
-
-    fn type_ids() -> Vec<TypeId> { vec![TypeId::of::<A>(), TypeId::of::<B>()] }
-
-    fn fetch<'a>(archetype: &'a Archetype, row: usize) -> Option<Self::Item<'a>>
-    {
-        let a = archetype.get_entry(&TypeId::of::<A>(), row)?;
-        let b = archetype.get_entry(&TypeId::of::<B>(), row)?;
-
-        Some((a, b))
-    }
-}
+// Generate implementations for tuples of sizes 1 through 4 (extend as needed)
+impl_query_param_tuple!(A);
+impl_query_param_tuple!(A, B);
+impl_query_param_tuple!(A, B, C);
+impl_query_param_tuple!(A, B, C, D);
 
 impl<'a, T: QueryParam> Query<'a, T>
 {

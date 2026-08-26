@@ -12,7 +12,6 @@ use crate::{
     jade::{camera::Camera, ecs::components::renderable::Renderable}, renderer::{
         batch::TextureBatch,
         camera_uniform::CameraBuffer,
-        mesh::Mesh,
         primitive::{PrimitivePipeline, draw_command::DrawCommand},
         texture::Texture,
         vertex::Vertex,

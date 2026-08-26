@@ -24,7 +24,7 @@ pub struct World
 
 impl World
 {
-    pub fn spawn(&mut self) -> EntityBuilder
+    pub fn spawn(&mut self) -> EntityBuilder<'_>
     {
         let entity = self.entities.alloc();
         EntityBuilder::new(self, entity)
@@ -46,7 +46,7 @@ impl World
         self.entities.dealloc(entity);
     }
 
-    pub(super) fn entity_map_entry(&mut self, entity: Entity) -> Entry<Entity, EntityLoc>
+    pub(super) fn entity_map_entry(&mut self, entity: Entity) -> Entry<'_, Entity, EntityLoc>
     {
         self.entity_map.entry(entity)
     }
@@ -72,7 +72,7 @@ impl World
 
     pub fn archetypes_iter(&self) -> impl Iterator<Item = &Archetype> { self.archetypes.iter() }
 
-    pub fn query<P: QueryParam>(&self) -> Query<P> { Query::new(self) }
+    pub fn query<P: QueryParam>(&self) -> Query<'_, P> { Query::new(self) }
 
     pub fn find_or_create_archetype(&mut self, type_ids: &[TypeId]) -> usize
     {
