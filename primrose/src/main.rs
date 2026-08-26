@@ -6,11 +6,6 @@ use engine::{
     glam::DVec2,
     handler::WindowHandler,
     jade::{
-        ecs::{
-            components::{basic_controller::PlayerController, camera::camera_lock::CameraLock, canvas::Canvas},
-            object::Object,
-            transform::{Anchor, Transform},
-        },
         scene::{Scene, manager::ManagedScene},
     },
     util::{
@@ -19,8 +14,6 @@ use engine::{
     },
     window::Window,
 };
-
-use crate::double_pendulum::DoublePendulum;
 
 struct Handler;
 
@@ -52,41 +45,11 @@ impl WindowHandler for Handler
         let texture = assetpool.get_texture("grass").unwrap();
         [
             (
-                "base",
-                ManagedScene::eager(
-                    Scene::new(dims)
-                        .with_object(
-                            Object::new(
-                                "grass",
-                                Transform::with_anchor(DVec2::ZERO, DVec2::splat(200.0), Anchor::Center),
-                            )
-                            .with_texture(texture.clone())
-                            .with_z_index(1)
-                            .with_component(PlayerController { speed: 200.0 })
-                            .with_component(CameraLock::default()),
-                        )
-                        .with_object(
-                            Object::new(
-                                "grass2",
-                                Transform {
-                                    pos: (200.0, 200.0).into(),
-                                    size: (100.0, 100.0).into(),
-                                },
-                            )
-                            .with_texture(texture),
-                        ),
-                ),
-            ),
-            (
                 "double_pendulum",
                 ManagedScene::eager(
-                    Scene::new(dims).with_object(
-                        Object::new("double_pendulum", Transform::default())
-                            .with_component(Canvas::default())
-                            .with_component(DoublePendulum::default()),
-                    ),
-                ),
-            ),
+                    Scene::new(dims)
+                )
+            )
         ]
     }
 

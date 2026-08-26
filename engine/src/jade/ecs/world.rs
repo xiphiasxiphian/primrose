@@ -3,11 +3,11 @@ use std::{
     collections::{HashMap, hash_map::Entry},
 };
 
-use crate::jade::ecs::{
+use crate::{jade::ecs::{
     components::{Archetype, Column},
     entity::{Entity, EntityAllocator, EntityBuilder},
     query::{Query, QueryParam},
-};
+}};
 
 type EntityLoc = (usize, usize);
 
@@ -60,14 +60,25 @@ impl World
     {
         self.resources
             .get(&TypeId::of::<R>())
-            .and_then(|r| (r as &dyn Any).downcast_ref::<R>())
+            .and_then(|r| (r.as_ref() as &dyn Any).downcast_ref::<R>())
     }
 
     pub fn resource_mut<R: Resource>(&mut self) -> Option<&mut R>
     {
         self.resources
             .get_mut(&TypeId::of::<R>())
-            .and_then(|r| (r as &mut dyn Any).downcast_mut::<R>())
+            .and_then(|r| (r.as_mut() as &mut dyn Any).downcast_mut::<R>())
+    }
+
+    pub fn remove_resource<R: Resource>(&mut self) -> Option<R>
+    {
+        self.resources
+            .remove(&TypeId::of::<R>())
+            .and_then(|r| {
+                let any_box: Box<dyn Any> = r;
+                any_box.downcast::<R>().ok()
+            })
+            .map(|x| *x)
     }
 
     pub fn archetypes_iter(&self) -> impl Iterator<Item = &Archetype> { self.archetypes.iter() }

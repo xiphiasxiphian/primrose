@@ -46,7 +46,6 @@ macro_rules! impl_query_param_tuple {
     };
 }
 
-// Bare reference implementation (kept separate due to non-tuple type structure)
 impl<A: Component> private::Sealed for &A {}
 impl<A: Component> QueryParam for &A {
     type Item<'a> = &'a A;
@@ -58,7 +57,6 @@ impl<A: Component> QueryParam for &A {
     }
 }
 
-// Generate implementations for tuples of sizes 1 through 4 (extend as needed)
 impl_query_param_tuple!(A);
 impl_query_param_tuple!(A, B);
 impl_query_param_tuple!(A, B, C);

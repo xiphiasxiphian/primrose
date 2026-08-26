@@ -6,7 +6,6 @@ use crate::{jade::ecs::components::Component, renderer::{ZIndex, mesh::Mesh, pri
 pub struct Renderable
 {
     pub texture: Option<TextureAsset>,
-    pub mesh: Mesh,
     pub draw_commands: Vec<DrawCommand>,
     pub zindex: ZIndex
 }

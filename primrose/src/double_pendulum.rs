@@ -1,11 +1,4 @@
-use engine::{
-    glam::DVec2,
-    jade::ecs::{
-        component::{Component, ComponentContext},
-        components::canvas::Canvas,
-        object::Object,
-    },
-};
+use engine::glam::DVec2;
 
 #[derive(Clone, Copy, Debug)]
 pub struct State
@@ -132,33 +125,5 @@ impl DoublePendulum
         let node2 = node1 + DVec2::new(self.state.theta2.sin(), self.state.theta2.cos()) * self.l2;
 
         (node1, node2)
-    }
-}
-
-impl Component for DoublePendulum
-{
-    fn tick(&mut self, parent: &mut Object, _ctx: &mut ComponentContext, dt: f64)
-    {
-        self.step(dt);
-
-        let Some(canvas) = parent.get_component_mut::<Canvas>()
-        else
-        {
-            log::warn!("Failed to get mutable canvas");
-            return;
-        };
-
-        let line_color = [0.0, 0.0, 1.0, 1.0];
-        let node_color = [1.0, 0.0, 0.0, 1.0];
-
-        let (node1, node2) = self.get_node_positions();
-
-        canvas.line(DVec2::ZERO, node1, 1.0, line_color);
-        canvas.circle(node1, 2.0, node_color, 64);
-
-        canvas.line(node1, node2, 1.0, line_color);
-        canvas.circle(node2, 2.0, node_color, 64);
-
-        log::debug!("{:?}", canvas.commands());
     }
 }

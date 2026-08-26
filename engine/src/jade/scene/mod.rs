@@ -1,7 +1,9 @@
 pub mod manager;
 
+use std::{cell::RefCell, rc::Rc};
+
 use crate::jade::{
-        camera::Camera, ecs::{entity::EntityBuilder, system::{Scheduler, Stage, System}, world::{Resource, World}},
+        camera::Camera, ecs::{entity::EntityBuilder, system::{Scheduler, Stage, System}, world::{Resource, World}}, input::InputState,
     };
 
 pub struct Scene
@@ -57,4 +59,9 @@ impl Scene
     {
         self.scheduler.add_system(stage, system);
     }
+}
+
+pub struct EngineState
+{
+    pub input: Rc<RefCell<InputState>>,
 }
