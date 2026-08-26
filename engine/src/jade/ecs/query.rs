@@ -1,7 +1,7 @@
 use std::{any::TypeId, marker::PhantomData};
 
 use crate::jade::ecs::{
-    component::{Archetype, Component},
+    components::{Archetype, Component},
     world::World,
 };
 

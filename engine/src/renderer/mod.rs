@@ -9,16 +9,14 @@ use wgpu::{
 };
 
 use crate::{
-    jade::{camera::Camera, ecs::object::Object},
-    renderer::{
+    jade::{camera::Camera, ecs::components::renderable::Renderable}, renderer::{
         batch::TextureBatch,
         camera_uniform::CameraBuffer,
         mesh::Mesh,
         primitive::{PrimitivePipeline, draw_command::DrawCommand},
         texture::Texture,
         vertex::Vertex,
-    },
-    util::assets::assetpool::TextureAsset,
+    }, util::assets::assetpool::TextureAsset,
 };
 
 pub mod batch;
@@ -30,14 +28,6 @@ pub mod texture;
 pub mod vertex;
 
 pub type ZIndex = i32;
-
-pub trait Renderable
-{
-    fn mesh(&self) -> Mesh;
-    fn texture(&self) -> Option<&TextureAsset>;
-    fn draw_commands(&self) -> &[DrawCommand];
-    fn z_index(&self) -> ZIndex;
-}
 
 pub struct Renderer
 {
@@ -142,22 +132,22 @@ impl Renderer
         }
     }
 
-    pub fn draw(&mut self, renderables: &[Object], device: &Device, queue: &Queue, view: &TextureView, camera: &Camera)
+    pub fn draw(&mut self, renderables: &[Renderable], device: &Device, queue: &Queue, view: &TextureView, camera: &Camera)
     {
         self.camera_buffer.update(queue, camera);
         let mut draw_commands: Vec<DrawCommand> = vec![];
 
         for renderable in renderables
         {
-            draw_commands.extend_from_slice(renderable.draw_commands());
+            draw_commands.extend_from_slice(&renderable.draw_commands);
 
-            let mesh = renderable.mesh();
-            let Some(texture) = renderable.texture()
+            let mesh = &renderable.mesh;
+            let Some(texture) = &renderable.texture
             else
             {
                 continue;
             };
-            let z = renderable.z_index();
+            let z = renderable.zindex;
 
             // TODO: again this keying only works because assetpool. improve in future
             let key = Arc::as_ptr(texture);

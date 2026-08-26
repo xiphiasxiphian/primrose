@@ -16,3 +16,4 @@ strum = { version = "0.28.0", features = ["derive"] }
 thiserror = "2.0.19"
 derive-new = "0.7.0"
 derive_more = { version = "2.1.1", features = ["full"] }
+proc-macros = { version = "0.1.0", path = "../proc-macros" }

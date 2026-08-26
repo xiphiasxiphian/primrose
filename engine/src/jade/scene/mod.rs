@@ -2,18 +2,13 @@ pub mod manager;
 
 use crate::{
     jade::{
-        audio::SoundHandler,
-        camera::Camera,
-        ecs::{system::Scheduler, world::World},
-        input::InputState,
-    },
-    renderer::Renderable,
-    util::assets::assetpool::AssetPool,
+        audio::SoundHandler, camera::Camera, ecs::{system::{Scheduler, Stage, System}, world::{Resource, World}}, input::InputState,
+    }, util::assets::assetpool::AssetPool,
 };
 
 pub struct Scene
 {
-    world: World,
+    pub world: World,
     scheduler: Scheduler,
     pub camera: Camera,
 }
@@ -28,27 +23,22 @@ impl Scene
             camera: Camera::new(viewport_dims),
         }
     }
+
+    pub fn with_resource<R: Resource>(mut self, resource: R) -> Self
+    {
+        self.world.insert_resource(resource);
+        self
+    }
+
+    // Wrap the scheduler functions as they are linked to the world
+
+    pub fn run_stage(&mut self, stage: Stage)
+    {
+        self.scheduler.run_stage(stage, &mut self.world);
+    }
+
+    pub fn add_system<S: System>(&mut self, stage: Stage, system: S)
+    {
+        self.scheduler.add_system(stage, system);
+    }
 }
-
-// pub struct ComponentContextIn<'a>
-// {
-//     pub input: &'a InputState,
-//     pub assetpool: &'a AssetPool,
-//     pub sound: &'a mut SoundHandler,
-// }
-
-// impl<'a> ComponentContextIn<'a>
-// {
-//     pub fn resolve<'b, 'c>(&'c mut self, camera: &'b mut Camera) -> ComponentContext<'b>
-//     where
-//         'a: 'b,
-//         'c: 'b,
-//     {
-//         ComponentContext {
-//             input: self.input,
-//             assetpool: self.assetpool,
-//             camera,
-//             sound: self.sound,
-//         }
-//     }
-// }

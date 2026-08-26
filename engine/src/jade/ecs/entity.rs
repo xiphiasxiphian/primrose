@@ -1,6 +1,6 @@
 use std::any::TypeId;
 
-use crate::jade::ecs::{component::Component, world::World};
+use crate::jade::ecs::{components::Component, world::World};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Entity
@@ -77,9 +77,9 @@ impl<'a> EntityBuilder<'a>
 
     pub fn build(self) -> Entity
     {
-        let type_ids = self.components.iter().map(|&(t, _)| t);
+        let type_ids = self.components.iter().map(|&(t, _)| t).collect::<Vec<_>>();
 
-        let arch_index = self.world.find_or_create_archetype(type_ids);
+        let arch_index = self.world.find_or_create_archetype(&type_ids);
         let arch = self
             .world
             .archetype_mut(arch_index)
@@ -88,7 +88,7 @@ impl<'a> EntityBuilder<'a>
 
         arch.add(self.entity, self.components);
 
-        self.world.entity_map_entry(entity).insert_entry((arch_index, row));
+        self.world.entity_map_entry(self.entity).insert_entry((arch_index, row));
 
         self.entity
     }

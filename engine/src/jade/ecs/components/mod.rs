@@ -1,9 +1,11 @@
+pub mod renderable;
+
 use std::{
     any::{Any, TypeId},
     collections::HashMap,
 };
 
-use crate::jade::ecs::{component, entity::Entity};
+use crate::jade::ecs::entity::Entity;
 
 pub trait Component: Any + 'static {}
 

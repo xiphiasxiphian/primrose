@@ -3,7 +3,7 @@ resolver = "2"
 members = [
     "engine",
     "primrose"
-]
+, "proc-macros"]
 
 [workspace.lints.rust]
 unfulfilled_lint_expectations = "deny"

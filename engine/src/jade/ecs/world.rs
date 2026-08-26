@@ -4,7 +4,7 @@ use std::{
 };
 
 use crate::jade::ecs::{
-    component::{Archetype, Column},
+    components::{Archetype, Column},
     entity::{Entity, EntityAllocator, EntityBuilder},
     query::{Query, QueryParam},
 };
@@ -74,17 +74,17 @@ impl World
 
     pub fn query<P: QueryParam>(&self) -> Query<P> { Query::new(self) }
 
-    pub fn find_or_create_archetype<'a>(&mut self, type_ids: impl IntoIterator<Item = &'a TypeId>) -> usize
+    pub fn find_or_create_archetype(&mut self, type_ids: &[TypeId]) -> usize
     {
-        if let Some(index) = self.archetypes.iter().position(|a| a.matches(type_ids.into_iter()))
+        if let Some(index) = self.archetypes.iter().position(|a| a.matches(type_ids))
         {
             return index;
         }
 
-        let columns = type_ids.into_iter().map(|&tid| (tid, Column::new(tid))).collect();
+        let columns = type_ids.iter().map(|&tid| (tid, Column::new(tid))).collect();
 
         self.archetypes
-            .push(Archetype::new(type_ids.into_iter.collect(), vec![], columns));
+            .push(Archetype::new(type_ids.iter().copied().collect(), vec![], columns));
 
         self.archetypes.len() - 1
     }
