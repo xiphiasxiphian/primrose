@@ -9,6 +9,7 @@ use std::{
 use crate::jade::ecs::entity::Entity;
 
 pub trait Component: Any + 'static {}
+pub use proc_macros::Component;
 
 pub struct Column
 {

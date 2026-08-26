@@ -15,7 +15,7 @@ use winit::{
 
 use crate::{
     clock::Clock, handler::WindowHandler, jade::{
-        audio::SoundHandler, ecs::{components::renderable::Renderable, system::Stage}, input::InputState, scene::manager::SceneManager,
+        audio::SoundHandler, ecs::{components::{renderable::RenderInfo, transform::Transform}, system::Stage}, input::InputState, scene::manager::SceneManager,
     }, renderer::Renderer, util::{
         assets::assetpool::AssetPool,
         settings::window::{FullscreenOptions, WindowDescriptor},
@@ -94,7 +94,7 @@ impl RunningState
 
         let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
         self.renderer
-            .draw(scene.world.query::<&Renderable>().iter(), &self.device, &self.queue, &view, &scene.camera);
+            .draw(scene.world.query::<(&Transform, &RenderInfo)>().iter(), &self.device, &self.queue, &view, &scene.camera);
 
         scene.run_stage(Stage::PreRender);
 

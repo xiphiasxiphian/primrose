@@ -3,16 +3,12 @@ mod double_pendulum;
 use std::iter;
 
 use engine::{
-    glam::DVec2,
-    handler::WindowHandler,
-    jade::{
-        scene::{Scene, manager::ManagedScene},
-    },
-    util::{
+    glam::DVec2, handler::WindowHandler, jade::{
+        ecs::components::{renderable::RenderInfo, transform::Transform}, scene::{Scene, manager::ManagedScene},
+    }, util::{
         assets::{ManagedResource, assetpool::AssetPool},
         settings::window::WindowDescriptor,
-    },
-    window::Window,
+    }, window::Window,
 };
 
 struct Handler;
@@ -48,6 +44,11 @@ impl WindowHandler for Handler
                 "double_pendulum",
                 ManagedScene::eager(
                     Scene::new(dims)
+                        .with_entity(|x| {
+                            x
+                                .with_component(Transform::default())
+                                .with_component(RenderInfo::default())
+                        })
                 )
             )
         ]

@@ -1,7 +1,6 @@
 use glam::DVec2;
 use proc_macros::Component;
-
-use crate::jade::ecs::components::Component;
+use crate::{renderer::mesh::Mesh};
 
 
 type Position = DVec2;
@@ -43,6 +42,16 @@ impl Transform
     pub fn stretch(&mut self, x_factor: f64, y_factor: f64)
     {
         self.size = self.size * DVec2::new(x_factor, y_factor).max(DVec2::ZERO);
+    }
+
+    pub fn mesh(&self) -> Mesh
+    {
+        Mesh::quad(
+            self.pos.x as f32,
+            self.pos.y as f32,
+            self.size.x as f32,
+            self.size.y as f32,
+        )
     }
 }
 

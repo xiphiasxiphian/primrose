@@ -32,13 +32,9 @@ impl Scene
 
     pub fn with_entity<F>(mut self, f: F) -> Self
     where
-        F: FnOnce(&mut EntityBuilder<'_>)
+        F: FnOnce(EntityBuilder<'_>) -> EntityBuilder<'_>
     {
-        let mut entity_builder = self.world.spawn();
-        f(&mut entity_builder);
-
-        entity_builder.build();
-
+        f(self.world.spawn()).build();
         self
     }
 

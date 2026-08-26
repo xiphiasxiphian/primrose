@@ -1,4 +1,4 @@
-use engine::glam::DVec2;
+use engine::{glam::DVec2, proc_macros::Component};
 
 #[derive(Clone, Copy, Debug)]
 pub struct State
@@ -9,7 +9,7 @@ pub struct State
     pub omega2: f64,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Component)]
 pub struct DoublePendulum
 {
     pub state: State,

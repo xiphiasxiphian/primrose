@@ -12,6 +12,7 @@ use crate::{jade::ecs::{
 type EntityLoc = (usize, usize);
 
 pub trait Resource: Any {}
+pub use proc_macros::Resource;
 
 #[derive(Default)]
 pub struct World
