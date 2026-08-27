@@ -1,6 +1,5 @@
-use std::{any::TypeId, collections::HashSet, marker::PhantomData, slice};
+use std::{any::TypeId, collections::HashSet, marker::PhantomData};
 
-use typeid::ConstTypeId;
 
 use crate::jade::ecs::{
     components::{Archetype, Component},

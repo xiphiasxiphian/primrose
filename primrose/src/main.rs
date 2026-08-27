@@ -1,10 +1,9 @@
 mod double_pendulum;
 
-use std::iter;
 
 use engine::{
-    glam::DVec2, handler::WindowHandler, jade::{
-        ecs::{components::{renderable::RenderInfo, transform::Transform}, system::Stage}, scene::{Scene, manager::ManagedScene},
+    handler::WindowHandler, jade::{
+        ecs::components::{renderable::RenderInfo, transform::Transform}, scene::{Scene, manager::ManagedScene},
     }, util::{
         assets::{ManagedResource, assetpool::AssetPool},
         settings::window::WindowDescriptor,
@@ -40,7 +39,7 @@ impl WindowHandler for Handler
         assetpool: &mut AssetPool,
     ) -> impl IntoIterator<Item = (&'static str, ManagedScene)>
     {
-        let texture = assetpool.get_texture("grass").unwrap();
+        let _texture = assetpool.get_texture("grass").unwrap();
         [
             (
                 "double_pendulum",
