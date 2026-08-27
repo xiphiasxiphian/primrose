@@ -9,9 +9,16 @@ use wgpu::{
 };
 
 use crate::{
-    jade::camera::Camera, renderer::{
-        batch::TextureBatch, camera_uniform::CameraBuffer, mesh::Mesh, primitive::{PrimitivePipeline, draw_command::DrawCommand}, texture::Texture, vertex::Vertex,
-    }, util::assets::assetpool::TextureAsset,
+    jade::camera::Camera,
+    renderer::{
+        batch::TextureBatch,
+        camera_uniform::CameraBuffer,
+        mesh::Mesh,
+        primitive::{PrimitivePipeline, draw_command::DrawCommand},
+        texture::Texture,
+        vertex::Vertex,
+    },
+    util::assets::assetpool::TextureAsset,
 };
 
 pub mod batch;
@@ -135,10 +142,16 @@ impl Renderer
         }
     }
 
-    pub fn draw<'a, I, R>(&mut self, renderables: I, device: &Device, queue: &Queue, view: &TextureView, camera: &Camera)
-    where
+    pub fn draw<'a, I, R>(
+        &mut self,
+        renderables: I,
+        device: &Device,
+        queue: &Queue,
+        view: &TextureView,
+        camera: &Camera,
+    ) where
         R: Renderable,
-        I: IntoIterator<Item = R>
+        I: IntoIterator<Item = R>,
     {
         self.camera_buffer.update(queue, camera);
         let mut draw_commands: Vec<DrawCommand> = vec![];

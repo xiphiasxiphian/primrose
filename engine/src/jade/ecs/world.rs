@@ -3,11 +3,11 @@ use std::{
     collections::{HashMap, hash_map::Entry},
 };
 
-use crate::{jade::ecs::{
+use crate::jade::ecs::{
     components::{Archetype, Column},
     entity::{Entity, EntityAllocator, EntityBuilder},
     query::{Query, QueryParam},
-}};
+};
 
 type EntityLoc = (usize, usize);
 

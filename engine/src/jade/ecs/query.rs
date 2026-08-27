@@ -1,6 +1,5 @@
 use std::{any::TypeId, collections::HashSet, marker::PhantomData};
 
-
 use crate::jade::ecs::{
     components::{Archetype, Component},
     world::World,
@@ -26,12 +25,11 @@ pub trait QueryParam: private::Sealed
 }
 
 impl<A: Component> private::Sealed for &A {}
-impl<A: Component> QueryParam for &A {
+impl<A: Component> QueryParam for &A
+{
     type Item<'a> = &'a A;
 
-    fn type_ids() -> Vec<(TypeId, bool)> {
-        vec![(TypeId::of::<A>(), false)]
-    }
+    fn type_ids() -> Vec<(TypeId, bool)> { vec![(TypeId::of::<A>(), false)] }
 
     unsafe fn fetch<'a>(archetype: &'a Archetype, row: usize) -> Option<Self::Item<'a>>
     {
@@ -42,12 +40,11 @@ impl<A: Component> QueryParam for &A {
 }
 
 impl<A: Component> private::Sealed for &mut A {}
-impl<A: Component> QueryParam for &mut A {
+impl<A: Component> QueryParam for &mut A
+{
     type Item<'a> = &'a mut A;
 
-    fn type_ids() -> Vec<(TypeId, bool)> {
-        vec![(TypeId::of::<A>(), true)]
-    }
+    fn type_ids() -> Vec<(TypeId, bool)> { vec![(TypeId::of::<A>(), true)] }
 
     unsafe fn fetch<'a>(archetype: &'a Archetype, row: usize) -> Option<Self::Item<'a>>
     {
@@ -59,7 +56,8 @@ impl<A: Component> QueryParam for &mut A {
     }
 }
 
-fn validate_query_params(type_ids: &[(TypeId, bool)]) {
+fn validate_query_params(type_ids: &[(TypeId, bool)])
+{
     let mut seen_mutable = HashSet::new();
     let mut seen_any = HashSet::new();
 
@@ -67,15 +65,18 @@ fn validate_query_params(type_ids: &[(TypeId, bool)]) {
     {
         assert!(
             !(*is_mut && seen_any.contains(tid)),
-            "Query: mutable access to {:?} conflicts with existing immutable access", tid
+            "Query: mutable access to {:?} conflicts with existing immutable access",
+            tid
         );
 
         assert!(
             !seen_mutable.contains(tid),
-            "Query: duplicate mutable access to {:?}", tid,
+            "Query: duplicate mutable access to {:?}",
+            tid,
         );
 
-        if *is_mut {
+        if *is_mut
+        {
             seen_mutable.insert(*tid);
         }
         seen_any.insert(*tid);
@@ -105,7 +106,7 @@ impl<'a, Q: QueryParam, I: Iterator<Item = &'a Archetype>> Iterator for QueryIte
                 self.row += 1;
 
                 // SAFETY: validate_query_params already has confirmed no aliasing
-                return Some(unsafe { Q::fetch(arch, row)? })
+                return Some(unsafe { Q::fetch(arch, row)? });
             }
 
             loop

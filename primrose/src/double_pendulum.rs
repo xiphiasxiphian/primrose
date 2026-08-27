@@ -1,4 +1,9 @@
-use engine::{clock::Clock, glam::DVec2, jade::ecs::{components::renderable::RenderInfo, world::World}, proc_macros::Component};
+use engine::{
+    clock::Clock,
+    glam::DVec2,
+    jade::ecs::{components::renderable::RenderInfo, world::World},
+    proc_macros::Component,
+};
 
 #[derive(Clone, Copy, Debug)]
 pub struct State
@@ -131,7 +136,11 @@ impl DoublePendulum
 fn double_pendulum_system(world: &mut World)
 {
     let query = world.query::<(&mut DoublePendulum, &mut RenderInfo)>();
-    let Some(clock) = world.resource::<Clock>() else { return };
+    let Some(clock) = world.resource::<Clock>()
+    else
+    {
+        return;
+    };
     for (double_pen, render) in query.iter()
     {
         double_pen.step(clock.dt());

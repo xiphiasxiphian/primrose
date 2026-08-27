@@ -11,7 +11,13 @@ pub struct Clock
 
 impl Clock
 {
-    pub fn new() -> Self { Self { last: Instant::now(), dt: 0.0 } }
+    pub fn new() -> Self
+    {
+        Self {
+            last: Instant::now(),
+            dt: 0.0,
+        }
+    }
 
     pub fn dt(&self) -> f64 { self.dt }
 

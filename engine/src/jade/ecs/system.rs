@@ -1,4 +1,3 @@
-
 use strum::EnumCount;
 
 use crate::jade::ecs::world::World;
@@ -63,7 +62,11 @@ impl Scheduler
 
     pub fn run_stage(&mut self, stage: Stage, world: &mut World)
     {
-        let Some(systems) = self.stages.get_mut(stage as usize) else { return };
+        let Some(systems) = self.stages.get_mut(stage as usize)
+        else
+        {
+            return;
+        };
         systems.iter_mut().for_each(|x| x.run(world));
     }
 }

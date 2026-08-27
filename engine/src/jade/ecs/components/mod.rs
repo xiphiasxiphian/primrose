@@ -2,7 +2,9 @@ pub mod renderable;
 pub mod transform;
 
 use std::{
-    any::{Any, TypeId}, cell::UnsafeCell, collections::HashMap,
+    any::{Any, TypeId},
+    cell::UnsafeCell,
+    collections::HashMap,
 };
 
 use crate::jade::ecs::entity::Entity;
@@ -26,11 +28,10 @@ impl Column
         }
     }
 
-    pub fn push<T: Component>(&mut self, value: T) {
-        self.data.push(UnsafeCell::new(Box::new(value)));
-    }
+    pub fn push<T: Component>(&mut self, value: T) { self.data.push(UnsafeCell::new(Box::new(value))); }
 
-    pub fn get<T: Component>(&self, row: usize) -> Option<&T> {
+    pub fn get<T: Component>(&self, row: usize) -> Option<&T>
+    {
         // SAFETY: shared reference, no mutation possible through &.
         let inner = unsafe { &*self.data[row].get() };
         inner.downcast_ref::<T>()
@@ -47,10 +48,7 @@ impl Column
         inner.downcast_mut::<T>()
     }
 
-    pub fn swap_remove(&mut self, row: usize)
-    {
-        self.data.swap_remove(row);
-    }
+    pub fn swap_remove(&mut self, row: usize) { self.data.swap_remove(row); }
 
     pub fn len(&self) -> usize { self.data.len() }
 }

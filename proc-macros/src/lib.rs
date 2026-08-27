@@ -1,5 +1,5 @@
-use proc_macro_crate::{crate_name, FoundCrate};
 use proc_macro::TokenStream;
+use proc_macro_crate::{FoundCrate, crate_name};
 use proc_macro2::Span;
 use quote::quote;
 use syn::{DeriveInput, Ident, parse_macro_input};
@@ -10,9 +10,11 @@ pub fn derive_component(input: TokenStream) -> TokenStream
     let DeriveInput { ident, .. } = parse_macro_input!(input);
     let found_crate = crate_name("engine").expect("engine must be present in Cargo.toml");
 
-    let crate_base = match found_crate {
+    let crate_base = match found_crate
+    {
         FoundCrate::Itself => quote!(crate),
-        FoundCrate::Name(name) => {
+        FoundCrate::Name(name) =>
+        {
             let ident = Ident::new(&name, Span::call_site());
             quote!(::#ident)
         }
@@ -33,9 +35,11 @@ pub fn derive_resource(input: TokenStream) -> TokenStream
     let DeriveInput { ident, .. } = parse_macro_input!(input);
     let found_crate = crate_name("engine").expect("engine must be present in Cargo.toml");
 
-    let crate_base = match found_crate {
+    let crate_base = match found_crate
+    {
         FoundCrate::Itself => quote!(crate),
-        FoundCrate::Name(name) => {
+        FoundCrate::Name(name) =>
+        {
             let ident = Ident::new(&name, Span::call_site());
             quote!(::#ident)
         }

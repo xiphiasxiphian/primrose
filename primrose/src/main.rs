@@ -1,13 +1,16 @@
 mod double_pendulum;
 
-
 use engine::{
-    handler::WindowHandler, jade::{
-        ecs::components::{renderable::RenderInfo, transform::Transform}, scene::{Scene, manager::ManagedScene},
-    }, util::{
+    handler::WindowHandler,
+    jade::{
+        ecs::components::{renderable::RenderInfo, transform::Transform},
+        scene::{Scene, manager::ManagedScene},
+    },
+    util::{
         assets::{ManagedResource, assetpool::AssetPool},
         settings::window::WindowDescriptor,
-    }, window::Window,
+    },
+    window::Window,
 };
 
 use crate::double_pendulum::DoublePendulum;
@@ -40,20 +43,14 @@ impl WindowHandler for Handler
     ) -> impl IntoIterator<Item = (&'static str, ManagedScene)>
     {
         let _texture = assetpool.get_texture("grass").unwrap();
-        [
-            (
-                "double_pendulum",
-                ManagedScene::eager(
-                    Scene::new(dims)
-                        .with_entity(|x| {
-                            x
-                                .with_component(Transform::default())
-                                .with_component(RenderInfo::default())
-                                .with_component(DoublePendulum::default())
-                        })
-                )
-            )
-        ]
+        [(
+            "double_pendulum",
+            ManagedScene::eager(Scene::new(dims).with_entity(|x| {
+                x.with_component(Transform::default())
+                    .with_component(RenderInfo::default())
+                    .with_component(DoublePendulum::default())
+            })),
+        )]
     }
 
     fn initial_scene() -> &'static str { "double_pendulum" }

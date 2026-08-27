@@ -1,7 +1,7 @@
 use glam::DVec2;
 use proc_macros::Component;
-use crate::{renderer::mesh::Mesh};
 
+use crate::renderer::mesh::Mesh;
 
 type Position = DVec2;
 type Size = DVec2;
