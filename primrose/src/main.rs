@@ -4,12 +4,14 @@ use std::iter;
 
 use engine::{
     glam::DVec2, handler::WindowHandler, jade::{
-        ecs::components::{renderable::RenderInfo, transform::Transform}, scene::{Scene, manager::ManagedScene},
+        ecs::{components::{renderable::RenderInfo, transform::Transform}, system::Stage}, scene::{Scene, manager::ManagedScene},
     }, util::{
         assets::{ManagedResource, assetpool::AssetPool},
         settings::window::WindowDescriptor,
     }, window::Window,
 };
+
+use crate::double_pendulum::DoublePendulum;
 
 struct Handler;
 
@@ -48,6 +50,7 @@ impl WindowHandler for Handler
                             x
                                 .with_component(Transform::default())
                                 .with_component(RenderInfo::default())
+                                .with_component(DoublePendulum::default())
                         })
                 )
             )

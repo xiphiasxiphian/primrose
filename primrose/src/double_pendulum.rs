@@ -1,4 +1,4 @@
-use engine::{glam::DVec2, proc_macros::Component};
+use engine::{clock::Clock, glam::DVec2, jade::ecs::{components::renderable::RenderInfo, world::World}, proc_macros::Component};
 
 #[derive(Clone, Copy, Debug)]
 pub struct State
@@ -125,5 +125,27 @@ impl DoublePendulum
         let node2 = node1 + DVec2::new(self.state.theta2.sin(), self.state.theta2.cos()) * self.l2;
 
         (node1, node2)
+    }
+}
+
+fn double_pendulum_system(world: &mut World)
+{
+    let query = world.query::<(&mut DoublePendulum, &mut RenderInfo)>();
+    let Some(clock) = world.resource::<Clock>() else { return };
+    for (double_pen, render) in query.iter()
+    {
+        double_pen.step(clock.dt());
+
+        let (node1, node2) = double_pen.get_node_positions();
+
+        let node_color = [1.0, 0.0, 0.0, 1.0];
+        let line_color = [0.0, 1.0, 0.0, 1.0];
+
+        // render pendulum
+        render.line(DVec2::ZERO, node1, 1.0, line_color);
+        render.line(node1, node2, 1.0, line_color);
+
+        render.circle(node1, 3.0, node_color, 64);
+        render.circle(node2, 3.0, node_color, 64);
     }
 }

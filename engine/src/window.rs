@@ -15,7 +15,7 @@ use winit::{
 
 use crate::{
     clock::Clock, handler::WindowHandler, jade::{
-        audio::SoundHandler, ecs::{components::{renderable::RenderInfo, transform::Transform}, system::Stage}, input::InputState, scene::manager::SceneManager,
+        audio::SoundHandler, ecs::{components::{renderable::RenderInfo, transform::Transform}, system::Stage, world::World}, input::InputState, scene::manager::SceneManager,
     }, renderer::Renderer, util::{
         assets::assetpool::AssetPool,
         settings::window::{FullscreenOptions, WindowDescriptor},
@@ -42,28 +42,30 @@ pub struct RunningState
 
 impl RunningState
 {
+    fn init(&mut self)
+    {
+        let scene = self.scene_manager.current_scene_mut();
+
+        // clock tick
+        scene.add_system(Stage::PreUpdate, |w: &mut World| {
+            w.resource_mut::<Clock>().iter_mut().for_each(|x| {
+                x.tick();
+            });
+        });
+
+        // clear draw commands
+        scene.add_system(Stage::PreUpdate, |w: &mut World| {
+            w.query::<&mut RenderInfo>().iter().for_each(|x| {
+                x.draw_commands.clear();
+            });
+        });
+    }
+
     fn draw(&mut self)
     {
         let scene = self.scene_manager.current_scene_mut();
         scene.run_stage(Stage::PreUpdate);
 
-        // // scene init
-        // if !self.started
-        // {
-        //     {
-        //         let input = self.input.borrow();
-        //         scene.start(&mut ComponentContextIn {
-        //             input: &input,
-        //             assetpool: &self.asset_pool,
-        //             sound: &mut self.sound_handler,
-        //         });
-        //     }
-
-        //     self.started = true;
-        // }
-
-        // main tick
-        let _dt = self.clock.tick();
         scene.run_stage(Stage::Update);
 
         let surface_frame = self.surface.get_current_texture();

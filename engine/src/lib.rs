@@ -1,4 +1,4 @@
-mod clock;
+pub mod clock;
 pub mod jade;
 mod renderer;
 
