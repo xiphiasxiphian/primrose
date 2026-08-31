@@ -12,7 +12,7 @@ pub struct Query<'a, T: QueryParam>
     _pd: PhantomData<T>,
 }
 
-impl<Q: QueryParam> SystemParam for Query<'_, Q>
+impl<Q: QueryParam> SystemParam for Query<'static, Q>
 {
     type Param<'a> = Query<'a, Q>;
     fn fetch<'a>(world: &'a mut World) -> Self::Param<'a> { world.query::<Q>() }

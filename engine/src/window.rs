@@ -2,8 +2,7 @@ use std::{cell::RefCell, rc::Rc, sync::Arc};
 
 use log::info;
 use wgpu::{
-    CurrentSurfaceTexture, Device, DeviceDescriptor, ExperimentalFeatures, Features, Instance, Limits, MemoryHints,
-    PowerPreference, Queue, RequestAdapterOptions, Surface, SurfaceColorSpace, SurfaceConfiguration, TextureUsages,
+    CurrentSurfaceTexture, Device, DeviceDescriptor, ExperimentalFeatures, Features, Instance, Limits, MemoryHints, PowerPreference, Queue, RequestAdapterOptions, Surface, SurfaceColorSpace, SurfaceConfiguration, TextureUsages, wgc::global::Global,
 };
 use winit::{
     application::ApplicationHandler,
@@ -14,21 +13,14 @@ use winit::{
 };
 
 use crate::{
-    clock::Clock,
-    handler::WindowHandler,
-    jade::{
-        audio::SoundHandler,
-        ecs::{
+    clock::Clock, handler::WindowHandler, jade::{
+        audio::SoundHandler, ecs::{
             components::{renderable::RenderInfo, transform::Transform},
             query::Query,
             system::scheduler::Stage,
             world::World,
-        },
-        input::InputState,
-        scene::manager::SceneManager,
-    },
-    renderer::Renderer,
-    util::{
+        }, input::InputState, scene::{Scene, manager::{GlobalResources, SceneManager}},
+    }, renderer::Renderer, util::{
         assets::assetpool::AssetPool,
         settings::window::{FullscreenOptions, WindowDescriptor},
     },
@@ -51,31 +43,10 @@ pub struct RunningState
 
 impl RunningState
 {
-    fn init_scene(&mut self)
-    {
-        let scene = self.scene_manager.current_scene_mut();
-
-        // clock tick
-        scene.add_system::<&mut World, _>(Stage::PreUpdate, |w: &mut World| {
-            w.resource_mut::<Clock>().iter_mut().for_each(|x| {
-                x.tick();
-            });
-        });
-
-        // clear draw commands
-        scene.add_system::<Query<&mut RenderInfo>, _>(Stage::PreUpdate, |q: Query<&mut RenderInfo>| {
-            q.iter().for_each(|x| {
-                x.draw_commands.clear();
-            });
-        });
-    }
-
     fn draw(&mut self)
     {
-        let scene = self.scene_manager.current_scene_mut();
-        scene.run_stage(Stage::PreUpdate);
-
-        scene.run_stage(Stage::Update);
+        self.scene_manager.run_stage(Stage::PreUpdate);
+        self.scene_manager.run_stage(Stage::Update);
 
         let surface_frame = self.surface.get_current_texture();
         let output = match surface_frame
@@ -101,18 +72,21 @@ impl RunningState
             }
         };
 
-        scene.run_stage(Stage::PostUpdate);
+        self.scene_manager.run_stage(Stage::PostUpdate);
+
 
         let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
-        self.renderer.draw(
-            scene.world.query::<(&Transform, &RenderInfo)>().iter(),
-            &self.device,
-            &self.queue,
-            &view,
-            &scene.camera,
-        );
+        self.scene_manager.with_current_scene(|scene| {
+            self.renderer.draw(
+                scene.world.query::<(&Transform, &RenderInfo)>().iter(),
+                &self.device,
+                &self.queue,
+                &view,
+                &scene.camera,
+            );
+        });
 
-        scene.run_stage(Stage::PreRender);
+        self.scene_manager.run_stage(Stage::PreRender);
 
         self.queue.present(output);
         self.input.borrow_mut().flush();
@@ -241,7 +215,7 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
         let renderer = Renderer::new(&device, surface_format);
         info!("Successfully init renderer");
 
-        let mut asset_pool = AssetPool::preloaded(
+        let asset_pool = AssetPool::preloaded(
             H::textures(),
             H::sounds(),
             device.clone(),
@@ -254,17 +228,13 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
         let clock = Clock::new();
         let input = Rc::new(RefCell::new(InputState::new()));
 
+        let scene_input = input.clone();
         let scene_manager = SceneManager::preloaded(
-            self.handler.scenes(
-                (self.descriptor.dims.0 as f32, self.descriptor.dims.1 as f32),
-                &mut asset_pool,
-            ),
+            |x: (f32, f32), y: &mut AssetPool| self.handler.scenes(x, y),
             H::initial_scene(),
+            GlobalResources { dims: self.descriptor.dims, clock, assetpool: asset_pool, input: scene_input, sound_handler }
         )
-        .expect("Failed to init scene manager")
-        .with_global(asset_pool)
-        .with_global(clock)
-        .with_global(sound_handler);
+        .expect("Failed to init scene manager");
 
         self.state = Some(RunningState {
             window,

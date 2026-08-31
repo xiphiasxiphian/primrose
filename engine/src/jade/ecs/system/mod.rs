@@ -2,14 +2,16 @@ pub mod scheduler;
 
 use std::marker::PhantomData;
 
-use crate::jade::ecs::{
+use wgpu::wgc::global::Global;
+
+use crate::jade::{ecs::{
     query::QueryParam,
     world::World,
-};
+}, scene::manager::GlobalResources};
 
 pub trait System: 'static
 {
-    fn run(&mut self, world: &mut World);
+    fn run(&mut self, world: &mut World, globals: &mut GlobalResources);
 }
 
 pub trait SystemParam
@@ -18,7 +20,7 @@ pub trait SystemParam
     fn fetch<'a>(world: &'a mut World) -> Self::Param<'a>;
 }
 
-impl SystemParam for &mut World
+impl SystemParam for &'static mut World
 {
     type Param<'a> = &'a mut World;
     fn fetch<'a>(world: &'a mut World) -> Self::Param<'a> { world }
@@ -33,12 +35,12 @@ pub struct FunctionSystem<F, P>
 impl<F, S> System for FunctionSystem<F, S>
 where
     S: SystemParam + 'static,
-    F: FnMut(S::Param<'_>) + 'static,
+    F: FnMut(S::Param<'_>, &mut GlobalResources) + 'static,
 {
-    fn run(&mut self, world: &mut World)
+    fn run(&mut self, world: &mut World, globals: &mut GlobalResources)
     {
         let param = S::fetch(world);
-        (self.func)(param)
+        (self.func)(param, globals)
     }
 }
 
@@ -51,7 +53,8 @@ pub trait IntoSystem<Q>
 impl<F, S> IntoSystem<S> for F
 where
     S: SystemParam + 'static,
-    F: FnMut(S::Param<'_>) + 'static,
+    F: for <'a, 'b> FnMut(S::Param<'a>, &'b mut GlobalResources) + 'static,
+    F: for <'b> FnMut(S, &'b mut GlobalResources)
 {
     type System = FunctionSystem<F, S>;
 

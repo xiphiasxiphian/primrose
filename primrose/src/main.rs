@@ -1,5 +1,7 @@
 mod double_pendulum;
 
+use std::collections::HashMap;
+
 use engine::{
     handler::WindowHandler,
     jade::{
@@ -40,7 +42,7 @@ impl WindowHandler for Handler
         &mut self,
         dims: (f32, f32),
         assetpool: &mut AssetPool,
-    ) -> impl IntoIterator<Item = (&'static str, ManagedScene)>
+    ) -> HashMap<&'static str, ManagedScene>
     {
         let _texture = assetpool.get_texture("grass").unwrap();
         [(
@@ -50,7 +52,7 @@ impl WindowHandler for Handler
                     .with_component(RenderInfo::default())
                     .with_component(DoublePendulum::default())
             })),
-        )]
+        )].into()
     }
 
     fn initial_scene() -> &'static str { "double_pendulum" }

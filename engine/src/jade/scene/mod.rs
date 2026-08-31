@@ -19,8 +19,9 @@ use crate::jade::{
 pub struct Scene
 {
     pub world: World,
-    scheduler: Scheduler,
+    pub(super) scheduler: Scheduler,
     pub camera: Camera,
+    pub init: bool,
 }
 
 impl Scene
@@ -31,6 +32,7 @@ impl Scene
             world: World::default(),
             scheduler: Scheduler::default(),
             camera: Camera::new(viewport_dims),
+            init: false,
         }
     }
 
@@ -50,7 +52,6 @@ impl Scene
 
     // Wrap the scheduler functions as they are linked to the world
 
-    pub fn run_stage(&mut self, stage: Stage) { self.scheduler.run_stage(stage, &mut self.world); }
 
     pub fn with_system<Q: SystemParam, S: IntoSystem<Q>>(mut self, stage: Stage, system: S) -> Self
     {

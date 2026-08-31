@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{
     jade::scene::manager::ManagedScene,
     util::assets::{ManagedResource, assetpool::AssetPool},
@@ -17,6 +19,6 @@ pub trait WindowHandler: 'static
         &mut self,
         dims: (f32, f32),
         _assetpool: &mut AssetPool,
-    ) -> impl IntoIterator<Item = (&'static str, ManagedScene)>;
+    ) -> HashMap<&'static str, ManagedScene>;
     fn initial_scene() -> &'static str;
 }

@@ -1,9 +1,9 @@
 use strum::EnumCount;
 
-use crate::jade::ecs::{
+use crate::jade::{ecs::{
     system::{IntoSystem, System, SystemParam},
     world::World,
-};
+}, scene::manager::GlobalResources};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, EnumCount)]
 pub enum Stage
@@ -38,7 +38,7 @@ impl Scheduler
         self.stages[stage as usize].push(Box::new(system.into_system()));
     }
 
-    pub fn run_all(&mut self, world: &mut World)
+    pub fn run_all(&mut self, world: &mut World, globals: &mut GlobalResources)
     {
         for stage in self.order
         {
@@ -47,17 +47,17 @@ impl Scheduler
             {
                 continue;
             };
-            systems.iter_mut().for_each(|x| x.run(world));
+            systems.iter_mut().for_each(|x| x.run(world, globals));
         }
     }
 
-    pub fn run_stage(&mut self, stage: Stage, world: &mut World)
+    pub fn run_stage(&mut self, stage: Stage, world: &mut World, globals: &mut GlobalResources)
     {
         let Some(systems) = self.stages.get_mut(stage as usize)
         else
         {
             return;
         };
-        systems.iter_mut().for_each(|x| x.run(world));
+        systems.iter_mut().for_each(|x| x.run(world, globals));
     }
 }

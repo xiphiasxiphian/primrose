@@ -1,61 +1,55 @@
 use std::{
-    any::{Any, TypeId},
-    collections::{HashMap, hash_map::Entry},
+    any::{Any, TypeId}, cell::RefCell, collections::{HashMap, hash_map::Entry}, rc::Rc,
 };
 
+use wgpu::wgc::global::Global;
+
 use crate::{
-    jade::{ecs::resource::Resource, scene::Scene},
-    util::assets::ManagedResource,
+    clock::Clock, jade::{audio::SoundHandler, ecs::{components::renderable::RenderInfo, query::Query, resource::Resource, system::scheduler::Stage, world::World}, input::InputState, scene::Scene}, util::assets::{ManagedResource, assetpool::AssetPool},
 };
 
 pub type ManagedScene = ManagedResource<Scene>;
+
+pub struct GlobalResources
+{
+    pub dims: (u32, u32),
+    pub clock: Clock,
+    pub assetpool: AssetPool,
+    pub input: Rc<RefCell<InputState>>,
+    pub sound_handler: SoundHandler,
+}
 
 pub struct SceneManager
 {
     scenes: HashMap<&'static str, ManagedScene>,
     current: &'static str,
-    global_resources: HashMap<TypeId, Box<dyn Resource>>,
+    global_resources: GlobalResources,
 }
 
 impl SceneManager
 {
-    pub fn preloaded(
-        iter: impl IntoIterator<Item = (&'static str, ManagedScene)>,
+    pub fn preloaded<F>(
+        scenes_generator: F,
         initial_scene: &'static str,
+        mut globals: GlobalResources,
     ) -> Option<Self>
+    where
+        F: FnOnce((f32, f32), &mut AssetPool) -> HashMap<&'static str, ManagedScene>
     {
-        let scenes = HashMap::from_iter(iter);
+        let scenes = scenes_generator((globals.dims.0 as f32, globals.dims.1 as f32), &mut globals.assetpool);
         if !scenes.contains_key(initial_scene)
         {
             return None;
         }
 
-        Some(Self {
+        let mut manager = Self {
             scenes: scenes,
             current: initial_scene,
-            global_resources: HashMap::new(),
-        })
-    }
+            global_resources: globals,
+        };
+        manager.with_current_scene(|x| Self::init_scene(x));
 
-    pub fn with_global<R: Resource>(mut self, resource: R) -> Self
-    {
-        self.global_resources.insert(TypeId::of::<R>(), Box::new(resource));
-
-        self
-    }
-
-    pub fn global<R: Resource>(&self) -> Option<&R>
-    {
-        self.global_resources
-            .get(&TypeId::of::<R>())
-            .and_then(|r| (r.as_ref() as &dyn Any).downcast_ref::<R>())
-    }
-
-    pub fn global_mut<R: Resource>(&mut self) -> Option<&mut R>
-    {
-        self.global_resources
-            .get_mut(&TypeId::of::<R>())
-            .and_then(|r| (r.as_mut() as &mut dyn Any).downcast_mut::<R>())
+        Some(manager)
     }
 
     pub fn add_scene(&mut self, name: &'static str, scene: ManagedScene) -> bool
@@ -69,6 +63,30 @@ impl SceneManager
                 true
             }
         }
+    }
+
+    pub fn init_scene(scene: &mut Scene)
+    {
+        fn tick_clock(_: &mut World, g: &mut GlobalResources) { g.clock.tick(); }
+        scene.add_system(Stage::PreUpdate, tick_clock);
+
+        fn clear_render(q: Query<&mut RenderInfo>, _: &mut GlobalResources) { q.iter().for_each(|x| x.draw_commands.clear()); }
+        scene.add_system(Stage::PreUpdate, clear_render);
+    }
+
+    pub fn run_stage(&mut self, stage: Stage)
+    {
+        let globals = &mut self.global_resources;
+        let scene = self.scenes.get_mut(&self.current).expect("Current scene set to invalid scene. This should be impossible").get();
+
+        scene.scheduler.run_stage(stage, &mut scene.world, globals);
+    }
+
+    pub fn with_current_scene<F, T>(&mut self, func: F) -> T
+    where
+        F: FnOnce(&mut Scene) -> T
+    {
+        func(self.current_scene_mut())
     }
 
     pub fn current_scene(&mut self) -> &Scene
@@ -92,6 +110,8 @@ impl SceneManager
         let result = self.scenes.get_mut(target)?.get();
         self.current = target;
 
+        if !result.init { Self::init_scene(result); }
+
         Some(result)
     }
 
@@ -104,7 +124,11 @@ impl SceneManager
         {
             return false;
         };
-        f(new_scene.get());
+
+        let result = new_scene.get();
+        if !result.init { Self::init_scene(result); }
+
+        f(result);
 
         true
     }
