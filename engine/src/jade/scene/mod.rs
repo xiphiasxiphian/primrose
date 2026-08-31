@@ -16,6 +16,10 @@ use crate::jade::{
     input::InputState,
 };
 
+#[expect(
+    clippy::partial_pub_fields,
+    reason = "Specifically ensuring scheduler is only avalibale to scene manager"
+)]
 pub struct Scene
 {
     pub world: World,

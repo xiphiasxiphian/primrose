@@ -30,7 +30,7 @@ pub struct SceneManager
 {
     scenes: HashMap<&'static str, ManagedScene>,
     current: &'static str,
-    global_resources: GlobalResources,
+    globals: GlobalResources,
 }
 
 impl SceneManager
@@ -46,9 +46,9 @@ impl SceneManager
         }
 
         let mut manager = Self {
-            scenes: scenes,
+            scenes,
             current: initial_scene,
-            global_resources: globals,
+            globals,
         };
         manager.with_current_scene(|x| Self::init_scene(x));
 
@@ -82,7 +82,7 @@ impl SceneManager
 
     pub fn run_stage(&mut self, stage: Stage)
     {
-        let globals = &mut self.global_resources;
+        let globals = &mut self.globals;
         let scene = self
             .scenes
             .get_mut(&self.current)

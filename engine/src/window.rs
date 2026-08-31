@@ -39,7 +39,6 @@ pub struct RunningState
     device: Device,
     queue: Queue,
     config: SurfaceConfiguration,
-    started: bool,
 
     // user level
     renderer: Renderer,
@@ -118,6 +117,10 @@ impl<H: WindowHandler> Window<H>
         }
     }
 
+    #[expect(
+        clippy::expect_used,
+        reason = "Panicking here is in program init anyway, in a trait method that doesnt return a Result"
+    )]
     pub fn run(handler: H, descriptor: &WindowDescriptor)
     {
         let event_loop = EventLoop::new().expect("Failed to create event loop");
@@ -151,6 +154,10 @@ impl<H: WindowHandler> Window<H>
 
 impl<H: WindowHandler> ApplicationHandler for Window<H>
 {
+    #[expect(
+        clippy::expect_used,
+        reason = "Panicking here is in program init anyway, in a trait method that doesnt return a Result"
+    )]
     fn resumed(&mut self, event_loop: &ActiveEventLoop)
     {
         if self.state.is_some()
@@ -225,12 +232,12 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
             H::sounds(),
             device.clone(),
             queue.clone(),
-            renderer.texture_bind_group_layout.clone(),
+            renderer.texture_bind_group_layout().clone(),
         )
         .expect("Failed to init assetpool");
 
         let sound_handler = SoundHandler::new().expect("Failed to init sound handler");
-        let clock = Clock::new();
+        let clock = Clock::default();
         let input = Rc::new(RefCell::new(InputState::new()));
 
         let scene_input = input.clone();
@@ -256,8 +263,7 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
             renderer,
             scene_manager,
             input,
-            started: false,
-        })
+        });
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, _window_id: WindowId, event: WindowEvent)
@@ -272,6 +278,10 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
         match event
         {
             WindowEvent::CloseRequested => event_loop.exit(),
+            #[expect(
+                clippy::cast_precision_loss,
+                reason = "loss of precision acceptable, as only occurs at levels where other problems will happen first"
+            )]
             WindowEvent::Resized(size) =>
             {
                 state.config.width = size.width;

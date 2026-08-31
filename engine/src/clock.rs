@@ -9,16 +9,20 @@ pub struct Clock
     dt: f64,
 }
 
-impl Clock
+impl Default for Clock
 {
-    pub fn new() -> Self
+    fn default() -> Self
     {
         Self {
             last: Instant::now(),
             dt: 0.0,
         }
     }
+}
 
+impl Clock
+{
+    #[must_use]
     pub fn dt(&self) -> f64 { self.dt }
 
     pub(crate) fn tick(&mut self) -> f64

@@ -41,8 +41,8 @@ pub trait Renderable
 
 pub struct Renderer
 {
-    pub texture_bind_group_layout: BindGroupLayout,
-    pub camera_buffer: CameraBuffer,
+    texture_bind_group_layout: BindGroupLayout,
+    camera_buffer: CameraBuffer,
     pipeline: RenderPipeline,
 
     primitive_pipeline: PrimitivePipeline,
@@ -214,8 +214,8 @@ impl Renderer
                 };
 
                 pass.set_bind_group(1, &texture.bind_group, &[]);
-                pass.set_vertex_buffer(0, batch.pool.vertex_buffer());
-                pass.set_index_buffer(batch.pool.index_buffer(), IndexFormat::Uint32);
+                pass.set_vertex_buffer(0, batch.pool().vertex_buffer());
+                pass.set_index_buffer(batch.pool().index_buffer(), IndexFormat::Uint32);
                 pass.draw_indexed(0..slice.0, 0, 0..1);
             }
 
@@ -229,4 +229,6 @@ impl Renderer
     }
 
     pub fn remove_batch(&mut self, texture: &Texture) { self.batches.remove(&(texture as *const Texture)); }
+
+    pub fn texture_bind_group_layout(&self) -> &BindGroupLayout { &self.texture_bind_group_layout }
 }

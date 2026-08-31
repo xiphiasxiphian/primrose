@@ -8,8 +8,8 @@ use crate::renderer::{
 
 pub struct TextureBatch
 {
-    pub pool: BufferPool,
-    pub min_z: i32,
+    pool: BufferPool,
+    min_z: i32,
     vertices: Vec<Vertex>,
     indices: Vec<u32>,
 }
@@ -62,4 +62,6 @@ impl TextureBatch
 
         self.pool.write(queue, &vertices, &indices)
     }
+
+    pub fn pool(&self) -> &BufferPool { &self.pool }
 }
