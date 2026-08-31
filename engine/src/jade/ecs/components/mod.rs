@@ -22,7 +22,7 @@ impl Column
     pub fn new(tid: TypeId) -> Self
     {
         Self {
-            data: Default::default(),
+            data: vec![],
             type_id: tid,
         }
     }
@@ -38,6 +38,7 @@ impl Column
 
     /// SAFETY: caller must guarantee no other
     /// reference to this (type, row) pair exists simultaneously
+    #[expect(clippy::mut_from_ref, reason = "See safety comments")]
     pub unsafe fn get_mut<T: Component>(&self, row: usize) -> Option<&mut T>
     {
         // SAFETY: UnsafeCell::get() gives *mut, which we dereference to &mut.

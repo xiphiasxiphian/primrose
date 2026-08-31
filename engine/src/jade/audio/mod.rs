@@ -1,6 +1,5 @@
 use kira::{
-    manager::{AudioManager, AudioManagerSettings, DefaultBackend, backend::Backend},
-    sound::static_sound::{StaticSoundData, StaticSoundHandle, StaticSoundSettings},
+    manager::{AudioManager, AudioManagerSettings, DefaultBackend, backend::Backend, error::PlaySoundError}, sound::static_sound::{StaticSoundData, StaticSoundHandle, StaticSoundSettings},
 };
 use proc_macros::Resource;
 
@@ -21,7 +20,7 @@ impl SoundHandler
         })
     }
 
-    pub fn play(&mut self, sound: &Sound) -> Result<StaticSoundHandle, kira::manager::error::PlaySoundError<()>>
+    pub fn play(&mut self, sound: &Sound) -> Result<StaticSoundHandle, PlaySoundError<()>>
     {
         self.manager.play(sound.clone())
     }
@@ -30,7 +29,7 @@ impl SoundHandler
         &mut self,
         sound: &Sound,
         settings: StaticSoundSettings,
-    ) -> Result<StaticSoundHandle, kira::manager::error::PlaySoundError<()>>
+    ) -> Result<StaticSoundHandle, PlaySoundError<()>>
     {
         self.manager.play(sound.clone().with_settings(settings))
     }

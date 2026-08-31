@@ -15,12 +15,14 @@ pub struct Transform
 
 impl Transform
 {
+    #[must_use]
     pub fn with_anchor(pos: Position, size: Size, anchor: Anchor) -> Self
     {
         let real_pos = anchor.to_top_left(pos, size);
         Transform { pos: real_pos, size }
     }
 
+    #[must_use]
     pub fn scaled(&self, factor: f64) -> Self
     {
         let mut new = *self;
@@ -31,6 +33,7 @@ impl Transform
 
     pub fn scale(&mut self, factor: f64) { self.size = (self.size * factor).max(DVec2::ZERO) }
 
+    #[must_use]
     pub fn stretched(&self, x_factor: f64, y_factor: f64) -> Self
     {
         let mut new = *self;
@@ -41,9 +44,11 @@ impl Transform
 
     pub fn stretch(&mut self, x_factor: f64, y_factor: f64)
     {
-        self.size = self.size * DVec2::new(x_factor, y_factor).max(DVec2::ZERO);
+        self.size *= DVec2::new(x_factor, y_factor).max(DVec2::ZERO);
     }
 
+    #[must_use]
+    #[expect(clippy::cast_possible_truncation, reason = "truncation will only happen at values where a problem will happen elsewhere first")]
     pub fn mesh(&self) -> Mesh
     {
         Mesh::quad(
@@ -68,6 +73,7 @@ pub enum Anchor
 
 impl Anchor
 {
+    #[must_use]
     pub fn to_top_left(self, Position { x, y }: Position, Size { x: w, y: h }: Size) -> Position
     {
         match self
@@ -81,16 +87,17 @@ impl Anchor
         .into()
     }
 
-    pub fn to_anchor(self, target: Self, old_pos: Position, size @ Size { x: w, y: h }: Size) -> Position
+    #[must_use]
+    pub fn to_anchor(self, target: Self, old_pos: Position, size @ Size { x: width, y: height }: Size) -> Position
     {
         let DVec2 { x, y } = self.to_top_left(old_pos, size);
         match target
         {
             Anchor::TopLeft => (x, y),
-            Anchor::TopRight => (x + w, y),
-            Anchor::BottomLeft => (x, y + h),
-            Anchor::BottomRight => (x + w, y + h),
-            Anchor::Center => (x + (w / 2.0), y + (h / 2.0)),
+            Anchor::TopRight => (x + width, y),
+            Anchor::BottomLeft => (x, y + height),
+            Anchor::BottomRight => (x + width, y + height),
+            Anchor::Center => (x + (width / 2.0), y + (height / 2.0)),
         }
         .into()
     }

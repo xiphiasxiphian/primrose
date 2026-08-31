@@ -38,12 +38,12 @@ impl RenderInfo
             radius,
             color,
             segments,
-        })
+        });
     }
 
     pub fn filled_rect(&mut self, pos: DVec2, size: DVec2, color: Color)
     {
-        self.draw_commands.push(DrawCommand::FilledRect { pos, size, color })
+        self.draw_commands.push(DrawCommand::FilledRect { pos, size, color });
     }
 }
 

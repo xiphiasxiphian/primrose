@@ -10,6 +10,7 @@ pub struct Camera
 
 impl Camera
 {
+    #[must_use]
     pub fn new(viewport_dims: (f32, f32)) -> Self
     {
         Self {
@@ -19,7 +20,7 @@ impl Camera
         }
     }
 
-    pub fn update_viewport(&mut self, (w, h): (f32, f32)) { self.viewport = Vec2::new(w, h) }
+    pub fn update_viewport(&mut self, dims: (f32, f32)) { self.viewport = dims.into()}
 
     pub fn set_zoom(&mut self, zoom: f32) -> f32
     {
@@ -33,6 +34,7 @@ impl Camera
         self.zoom
     }
 
+    #[must_use]
     pub fn view_projection(&self) -> Mat4
     {
         let prog = orthographic(0.0, self.viewport.x, self.viewport.y, 0.0, -1.0, 1.0);
