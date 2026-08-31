@@ -17,14 +17,14 @@ use crate::jade::{
     input::InputState,
 };
 
-pub struct Scene<'w>
+pub struct Scene
 {
-    pub world: World<'w>,
+    pub world: World,
     scheduler: Scheduler,
     pub camera: Camera,
 }
 
-impl<'w> Scene<'w>
+impl Scene
 {
     pub fn new(viewport_dims: (f32, f32)) -> Self
     {
@@ -53,13 +53,13 @@ impl<'w> Scene<'w>
 
     pub fn run_stage(&mut self, stage: Stage) { self.scheduler.run_stage(stage, &mut self.world); }
 
-    pub fn with_system<'w, P: SystemParam<'w>, S: IntoSystem<P>>(mut self, stage: Stage, system: S) -> Self
+    pub fn with_system<Q: SystemParam, S: IntoSystem<Q>>(mut self, stage: Stage, system: S) -> Self
     {
         self.scheduler.add_system(stage, system);
         self
     }
 
-    pub fn add_system<'w, P: SystemParam<'w>, S: IntoSystem<P>>(&mut self, stage: Stage, system: S)
+    pub fn add_system<Q: SystemParam, S: IntoSystem<Q>>(&mut self, stage: Stage, system: S)
     {
         self.scheduler.add_system(stage, system);
     }

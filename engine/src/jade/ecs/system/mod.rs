@@ -7,21 +7,21 @@ use crate::jade::ecs::{
     world::World,
 };
 
-pub trait System<'w>: 'static
+pub trait System: 'static
 {
-    fn run(&mut self, world: &mut World<'w>);
+    fn run(&mut self, world: &mut World);
 }
 
-pub trait SystemParam<'w>
+pub trait SystemParam
 {
-    type Param<'a> where 'w: 'a;
-    fn fetch<'a>(world: &'a mut World<'w>) -> Self::Param<'a>;
+    type Param<'a>;
+    fn fetch<'a>(world: &'a mut World) -> Self::Param<'a>;
 }
 
-impl<'w> SystemParam<'w> for &mut World<'w>
+impl SystemParam for &mut World
 {
-    type Param<'a> = &'a mut World<'w>;
-    fn fetch<'a>(world: &'a mut World<'w>) -> Self::Param<'a> { world }
+    type Param<'a> = &'a mut World;
+    fn fetch<'a>(world: &'a mut World) -> Self::Param<'a> { world }
 }
 
 pub struct FunctionSystem<F, P>
@@ -30,12 +30,12 @@ pub struct FunctionSystem<F, P>
     _pd: PhantomData<fn(P)>,
 }
 
-impl<'w, F, S> System<'w> for FunctionSystem<F, S>
+impl<F, S> System for FunctionSystem<F, S>
 where
-    S: SystemParam<'w> + 'static,
+    S: SystemParam + 'static,
     F: FnMut(S::Param<'_>) + 'static,
 {
-    fn run(&mut self, world: &mut World<'w>)
+    fn run(&mut self, world: &mut World)
     {
         let param = S::fetch(world);
         (self.func)(param)
@@ -48,9 +48,9 @@ pub trait IntoSystem<Q>
     fn into_system(self) -> Self::System;
 }
 
-impl<'w, F, S> IntoSystem<S> for F
+impl<F, S> IntoSystem<S> for F
 where
-    S: SystemParam<'w> + 'static,
+    S: SystemParam + 'static,
     F: FnMut(S::Param<'_>) + 'static,
 {
     type System = FunctionSystem<F, S>;

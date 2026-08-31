@@ -8,14 +8,14 @@ use crate::jade::ecs::{
 
 pub struct Query<'a, T: QueryParam>
 {
-    world: &'a World<'a>,
+    world: &'a World,
     _pd: PhantomData<T>,
 }
 
-impl<'w, Q: QueryParam> SystemParam<'w> for Query<'_, Q>
+impl<Q: QueryParam> SystemParam for Query<'_, Q>
 {
-    type Param<'a> = Query<'a, Q> where 'w: 'a;
-    fn fetch<'a>(world: &'a mut World<'w>) -> Self::Param<'a> { world.query::<Q>() }
+    type Param<'a> = Query<'a, Q>;
+    fn fetch<'a>(world: &'a mut World) -> Self::Param<'a> { world.query::<Q>() }
 }
 
 mod private
