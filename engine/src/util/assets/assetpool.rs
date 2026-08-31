@@ -2,6 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use image::ImageError;
 use kira::sound::{FromFileError, static_sound::StaticSoundData};
+use proc_macros::Resource;
 use wgpu::{BindGroupLayout, Device, Queue};
 
 use crate::{jade::audio::Sound, renderer::texture::Texture, util::assets::ManagedResource};
@@ -10,7 +11,7 @@ pub type Asset<T> = Arc<T>;
 pub type TextureAsset = Asset<Texture>;
 pub type SoundAsset = Sound;
 
-#[derive(Default)]
+#[derive(Default, Resource)]
 pub struct AssetPool
 {
     textures: HashMap<&'static str, ManagedResource<TextureAsset>>,

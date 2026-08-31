@@ -1,18 +1,6 @@
 use strum::EnumCount;
 
-use crate::jade::ecs::world::World;
-
-pub trait System: 'static
-{
-    fn run(&mut self, world: &mut World);
-}
-
-impl<F> System for F
-where
-    F: Fn(&mut World) + 'static,
-{
-    fn run(&mut self, world: &mut World) { (self)(world) }
-}
+use crate::jade::ecs::{query::QueryParam, system::{IntoSystem, System, SystemParam}, world::World};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, EnumCount)]
 pub enum Stage
@@ -42,9 +30,9 @@ impl Default for Scheduler
 
 impl Scheduler
 {
-    pub fn add_system<S: System>(&mut self, stage: Stage, system: S)
+    pub fn add_system<Q: SystemParam, S: IntoSystem<Q>>(&mut self, stage: Stage, system: S)
     {
-        self.stages[stage as usize].push(Box::new(system));
+        self.stages[stage as usize].push(Box::new(system.into_system()));
     }
 
     pub fn run_all(&mut self, world: &mut World)

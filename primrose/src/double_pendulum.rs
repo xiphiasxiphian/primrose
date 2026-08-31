@@ -1,8 +1,5 @@
 use engine::{
-    clock::Clock,
-    glam::DVec2,
-    jade::ecs::{components::renderable::RenderInfo, world::World},
-    proc_macros::Component,
+    clock::Clock, glam::DVec2, jade::ecs::{components::renderable::RenderInfo, query::Query, world::World}, proc_macros::Component,
 };
 
 #[derive(Clone, Copy, Debug)]
@@ -141,6 +138,7 @@ fn double_pendulum_system(world: &mut World)
     {
         return;
     };
+
     for (double_pen, render) in query.iter()
     {
         double_pen.step(clock.dt());

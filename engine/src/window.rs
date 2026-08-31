@@ -14,20 +14,11 @@ use winit::{
 };
 
 use crate::{
-    clock::Clock,
-    handler::WindowHandler,
-    jade::{
-        audio::SoundHandler,
-        ecs::{
-            components::{renderable::RenderInfo, transform::Transform},
-            system::Stage,
-            world::World,
-        },
-        input::InputState,
-        scene::manager::SceneManager,
-    },
-    renderer::Renderer,
-    util::{
+    clock::Clock, handler::WindowHandler, jade::{
+        audio::SoundHandler, ecs::{
+            components::{renderable::RenderInfo, transform::Transform}, query::Query, system::scheduler::Stage, world::World,
+        }, input::InputState, scene::manager::SceneManager,
+    }, renderer::Renderer, util::{
         assets::assetpool::AssetPool,
         settings::window::{FullscreenOptions, WindowDescriptor},
     },
@@ -46,27 +37,24 @@ pub struct RunningState
     renderer: Renderer,
     scene_manager: SceneManager,
     input: Rc<RefCell<InputState>>,
-    clock: Clock,
-    sound_handler: SoundHandler,
-    asset_pool: AssetPool,
 }
 
 impl RunningState
 {
-    fn init(&mut self)
+    fn init_scene(&mut self)
     {
         let scene = self.scene_manager.current_scene_mut();
 
         // clock tick
-        scene.add_system(Stage::PreUpdate, |w: &mut World| {
+        scene.add_system::<&mut World, _>(Stage::PreUpdate, |w: &mut World| {
             w.resource_mut::<Clock>().iter_mut().for_each(|x| {
                 x.tick();
             });
         });
 
         // clear draw commands
-        scene.add_system(Stage::PreUpdate, |w: &mut World| {
-            w.query::<&mut RenderInfo>().iter().for_each(|x| {
+        scene.add_system::<Query<&mut RenderInfo>, _>(Stage::PreUpdate, |q: Query<&mut RenderInfo>| {
+            q.iter().for_each(|x| {
                 x.draw_commands.clear();
             });
         });
@@ -254,6 +242,7 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
 
         let sound_handler = SoundHandler::new().expect("Failed to init sound handler");
         let clock = Clock::new();
+        let input = Rc::new(RefCell::new(InputState::new()));
 
         let scene_manager = SceneManager::preloaded(
             self.handler.scenes(
@@ -262,7 +251,11 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
             ),
             H::initial_scene(),
         )
-        .expect("Failed to init scene manager");
+        .expect("Failed to init scene manager")
+        .with_global(asset_pool)
+        .with_global(clock)
+        .with_global(input.clone())
+        .with_global(sound_handler);
 
         self.state = Some(RunningState {
             window,
@@ -272,10 +265,7 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
             config,
             renderer,
             scene_manager,
-            input: Rc::new(RefCell::new(InputState::new())),
-            clock,
-            sound_handler,
-            asset_pool,
+            input,
             started: false,
         })
     }

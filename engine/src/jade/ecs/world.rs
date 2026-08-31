@@ -1,18 +1,19 @@
 use std::{
-    any::{Any, TypeId},
-    collections::{HashMap, hash_map::Entry},
+    any::{Any, TypeId}, cell::RefCell, collections::{HashMap, hash_map::Entry}, rc::Rc,
 };
 
-use crate::jade::ecs::{
+use crate::jade::{ecs::{
     components::{Archetype, Column},
     entity::{Entity, EntityAllocator, EntityBuilder},
     query::{Query, QueryParam},
-};
+}, scene::manager::SceneManager};
 
 type EntityLoc = (usize, usize);
 
 pub trait Resource: Any {}
 pub use proc_macros::Resource;
+
+impl<R: Resource> Resource for Rc<RefCell<R>> {}
 
 #[derive(Default)]
 pub struct World

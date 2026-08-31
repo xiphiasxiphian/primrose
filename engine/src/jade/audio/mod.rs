@@ -2,9 +2,11 @@ use kira::{
     manager::{AudioManager, AudioManagerSettings, DefaultBackend, backend::Backend},
     sound::static_sound::{StaticSoundData, StaticSoundHandle, StaticSoundSettings},
 };
+use proc_macros::Resource;
 
 pub type Sound = StaticSoundData;
 
+#[derive(Resource)]
 pub struct SoundHandler
 {
     manager: AudioManager,

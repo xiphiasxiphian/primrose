@@ -1,14 +1,21 @@
 use std::{any::TypeId, collections::HashSet, marker::PhantomData};
 
 use crate::jade::ecs::{
-    components::{Archetype, Component},
-    world::World,
+    components::{Archetype, Component}, system::SystemParam, world::World,
 };
 
 pub struct Query<'a, T: QueryParam>
 {
     world: &'a World,
     _pd: PhantomData<T>,
+}
+
+impl<Q: QueryParam> SystemParam for Query<'_, Q>
+{
+    type Param<'a> = Query<'a, Q>;
+    fn fetch<'a>(world: &'a mut World) -> Self::Param<'a> {
+        world.query::<Q>()
+    }
 }
 
 mod private

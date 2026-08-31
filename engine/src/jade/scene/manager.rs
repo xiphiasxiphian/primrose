@@ -1,6 +1,6 @@
-use std::collections::{HashMap, hash_map::Entry};
+use std::{any::{Any, TypeId}, cell::RefCell, collections::{HashMap, hash_map::Entry}, rc::Rc};
 
-use crate::{jade::scene::Scene, util::assets::ManagedResource};
+use crate::{clock::Clock, jade::{audio::SoundHandler, ecs::world::Resource, input::InputState, scene::Scene}, util::assets::{ManagedResource, assetpool::AssetPool}};
 
 pub type ManagedScene = ManagedResource<Scene>;
 
@@ -8,6 +8,7 @@ pub struct SceneManager
 {
     scenes: HashMap<&'static str, ManagedScene>,
     current: &'static str,
+    global_resources: HashMap<TypeId, Box<dyn Resource>>,
 }
 
 impl SceneManager
@@ -26,7 +27,32 @@ impl SceneManager
         Some(Self {
             scenes: scenes,
             current: initial_scene,
+            global_resources: HashMap::new(),
         })
+    }
+
+    pub fn with_global<R: Resource>(mut self, resource: R) -> Self
+    {
+        self.global_resources.insert(
+            TypeId::of::<R>(),
+            Box::new(resource),
+        );
+
+        self
+    }
+
+    pub fn global<R: Resource>(&self) -> Option<&R>
+    {
+        self.global_resources
+            .get(&TypeId::of::<R>())
+            .and_then(|r| (r.as_ref() as &dyn Any).downcast_ref::<R>())
+    }
+
+    pub fn global_mut<R: Resource>(&mut self) -> Option<&mut R>
+    {
+        self.global_resources
+            .get_mut(&TypeId::of::<R>())
+            .and_then(|r| (r.as_mut() as &mut dyn Any).downcast_mut::<R>())
     }
 
     pub fn add_scene(&mut self, name: &'static str, scene: ManagedScene) -> bool

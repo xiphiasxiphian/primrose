@@ -1,6 +1,7 @@
 pub mod key;
 pub mod mouse;
 
+use proc_macros::Resource;
 use strum::EnumCount;
 use winit::{
     dpi::PhysicalPosition,
@@ -12,7 +13,7 @@ use crate::jade::input::{key::Key, mouse::MouseButton};
 
 pub type MousePos = PhysicalPosition<f64>;
 
-#[derive(Debug)]
+#[derive(Debug, Resource)]
 pub struct InputState
 {
     keys_held: [bool; Key::COUNT],
