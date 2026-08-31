@@ -1,14 +1,11 @@
 use std::{
     any::{Any, TypeId},
-    cell::RefCell,
     collections::{HashMap, hash_map::Entry},
-    rc::Rc,
 };
 
 use crate::{
-    clock::Clock,
-    jade::{audio::SoundHandler, ecs::resource::Resource, input::InputState, scene::Scene},
-    util::assets::{ManagedResource, assetpool::AssetPool},
+    jade::{ecs::resource::Resource, scene::Scene},
+    util::assets::ManagedResource,
 };
 
 pub type ManagedScene = ManagedResource<Scene>;
