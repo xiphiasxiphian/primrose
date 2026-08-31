@@ -254,7 +254,6 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
         .expect("Failed to init scene manager")
         .with_global(asset_pool)
         .with_global(clock)
-        .with_global(input.clone())
         .with_global(sound_handler);
 
         self.state = Some(RunningState {

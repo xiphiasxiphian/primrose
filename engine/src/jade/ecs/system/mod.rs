@@ -2,7 +2,7 @@ pub mod scheduler;
 
 use std::marker::PhantomData;
 
-use crate::jade::ecs::{query::{Query, QueryParam}, world::{Resource, World}};
+use crate::jade::ecs::{query::{Query, QueryParam}, world::{World}};
 
 pub trait System: 'static
 {

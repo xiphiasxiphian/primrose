@@ -3,17 +3,10 @@ use std::{
 };
 
 use crate::jade::{ecs::{
-    components::{Archetype, Column},
-    entity::{Entity, EntityAllocator, EntityBuilder},
-    query::{Query, QueryParam},
+    components::{Archetype, Column}, entity::{Entity, EntityAllocator, EntityBuilder}, query::{Query, QueryParam}, resource::Resource,
 }, scene::manager::SceneManager};
 
 type EntityLoc = (usize, usize);
-
-pub trait Resource: Any {}
-pub use proc_macros::Resource;
-
-impl<R: Resource> Resource for Rc<RefCell<R>> {}
 
 #[derive(Default)]
 pub struct World

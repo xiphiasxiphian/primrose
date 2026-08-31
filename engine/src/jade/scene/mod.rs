@@ -4,7 +4,7 @@ use std::{cell::RefCell, rc::Rc};
 
 use crate::jade::{
     camera::Camera, ecs::{
-        entity::EntityBuilder, query::QueryParam, system::{IntoSystem, SystemParam, scheduler::{Scheduler, Stage}}, world::{Resource, World},
+        entity::EntityBuilder, query::QueryParam, resource::Resource, system::{IntoSystem, SystemParam, scheduler::{Scheduler, Stage}}, world::World,
     }, input::InputState,
 };
 

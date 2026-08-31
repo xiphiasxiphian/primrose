@@ -1,6 +1,6 @@
 use std::{any::{Any, TypeId}, cell::RefCell, collections::{HashMap, hash_map::Entry}, rc::Rc};
 
-use crate::{clock::Clock, jade::{audio::SoundHandler, ecs::world::Resource, input::InputState, scene::Scene}, util::assets::{ManagedResource, assetpool::AssetPool}};
+use crate::{clock::Clock, jade::{audio::SoundHandler, ecs::resource::Resource, input::InputState, scene::Scene}, util::assets::{ManagedResource, assetpool::AssetPool}};
 
 pub type ManagedScene = ManagedResource<Scene>;
 

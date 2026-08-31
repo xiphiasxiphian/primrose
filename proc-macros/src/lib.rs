@@ -45,10 +45,19 @@ pub fn derive_resource(input: TokenStream) -> TokenStream
         }
     };
 
-    let crate_path = quote!(#crate_base::jade::ecs::world);
+    let crate_path = quote!(#crate_base::jade::ecs::resource);
 
     let output = quote! {
-        impl #crate_path::Resource for #ident {}
+        impl #crate_path::Resource for #ident
+        {
+            // type Ref<'a> = &'a #ident;
+            // type RefMut<'a> = &'a mut #ident;
+
+            // fn id() -> std::any::TypeId { std::any::TypeId::of::<#ident>() }
+
+            // fn resource_ref<'a>(&'a self) -> Self::Ref<'a> { self }
+            // fn resource_ref_mut<'a>(&'a mut self) -> Self::RefMut<'a> { self }
+        }
     };
 
     output.into()
