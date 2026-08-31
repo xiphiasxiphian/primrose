@@ -3,27 +3,29 @@ use std::{
     collections::{HashMap, hash_map::Entry},
 };
 
-use crate::jade::ecs::{
+use crate::jade::{ecs::{
         components::{Archetype, Column},
         entity::{Entity, EntityAllocator, EntityBuilder},
         query::{Query, QueryParam},
         resource::Resource,
-    };
+    }, scene::manager::SceneManager};
 
 type EntityLoc = (usize, usize);
 
 #[derive(Default)]
-pub struct World
+pub struct World<'a>
 {
     entities: EntityAllocator,
     archetypes: Vec<Archetype>,
     entity_map: HashMap<Entity, EntityLoc>,
     resources: HashMap<TypeId, Box<dyn Resource>>,
+    scene_manager: Option<&'a mut SceneManager>,
 }
 
-impl World
+impl<'a> World<'a>
 {
-    pub fn spawn(&mut self) -> EntityBuilder<'_>
+    pub fn spawn<'b>(&'b mut self) -> EntityBuilder<'b>
+    where 'a: 'b
     {
         let entity = self.entities.alloc();
         EntityBuilder::new(self, entity)

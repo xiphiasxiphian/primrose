@@ -33,7 +33,7 @@ impl Default for Scheduler
 
 impl Scheduler
 {
-    pub fn add_system<Q: SystemParam, S: IntoSystem<Q>>(&mut self, stage: Stage, system: S)
+    pub fn add_system<'w, P: SystemParam<'w>, S: IntoSystem<P>>(&mut self, stage: Stage, system: S)
     {
         self.stages[stage as usize].push(Box::new(system.into_system()));
     }

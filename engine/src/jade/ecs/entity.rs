@@ -53,14 +53,14 @@ impl EntityAllocator
 
 pub struct EntityBuilder<'a>
 {
-    world: &'a mut World,
+    world: &'a mut World<'a>,
     entity: Entity,
     components: Vec<(TypeId, Box<dyn Component>)>,
 }
 
 impl<'a> EntityBuilder<'a>
 {
-    pub fn new(world: &'a mut World, entity: Entity) -> Self
+    pub fn new(world: &'a mut World<'a>, entity: Entity) -> Self
     {
         Self {
             world,
