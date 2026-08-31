@@ -2,10 +2,7 @@ use engine::{
     glam::DVec2,
     jade::{
         ecs::{
-            components::{
-                renderable::RenderInfo,
-                transform::Transform,
-            },
+            components::{renderable::RenderInfo, transform::Transform},
             query::Query,
         },
         scene::manager::GlobalResources,
@@ -57,6 +54,42 @@ impl Default for DoublePendulum
 
 impl DoublePendulum
 {
+    pub fn with_theta1(mut self, theta: f64) -> Self
+    {
+        self.state.theta1 = theta;
+        self
+    }
+
+    pub fn with_theta2(mut self, theta: f64) -> Self
+    {
+        self.state.theta2 = theta;
+        self
+    }
+
+    pub fn with_length1(mut self, length: f64) -> Self
+    {
+        self.l1 = length;
+        self
+    }
+
+    pub fn with_length2(mut self, length: f64) -> Self
+    {
+        self.l2 = length;
+        self
+    }
+
+    pub fn with_mass1(mut self, mass: f64) -> Self
+    {
+        self.m1 = mass;
+        self
+    }
+
+    pub fn with_mass2(mut self, mass: f64) -> Self
+    {
+        self.m2 = mass;
+        self
+    }
+
     fn derivatives(&self, s: State) -> (f64, f64, f64, f64)
     {
         let Self {

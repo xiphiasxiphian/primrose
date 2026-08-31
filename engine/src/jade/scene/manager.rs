@@ -4,15 +4,11 @@ use std::{
     rc::Rc,
 };
 
-
 use crate::{
     clock::Clock,
     jade::{
         audio::SoundHandler,
-        ecs::{
-            components::renderable::RenderInfo, query::Query, system::scheduler::Stage,
-            world::World,
-        },
+        ecs::{components::renderable::RenderInfo, query::Query, system::scheduler::Stage, world::World},
         input::InputState,
         scene::Scene,
     },

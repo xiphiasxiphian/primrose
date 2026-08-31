@@ -54,6 +54,11 @@ impl WindowHandler for Handler
                             .with_component(RenderInfo::default())
                             .with_component(DoublePendulum::default())
                     })
+                    .with_entity(|x| {
+                        x.with_component(Transform::new(DVec2::new(0.0, -200.0), DVec2::default()))
+                            .with_component(RenderInfo::default())
+                            .with_component(DoublePendulum::default().with_theta1(89.99_f64.to_radians()))
+                    })
                     .with_system(Stage::Update, double_pendulum_system),
             ),
         )]
