@@ -219,10 +219,10 @@ impl Renderer
                 pass.draw_indexed(0..slice.0, 0, 0..1);
             }
 
-            log::debug!("{:?}", draw_commands);
+            log::debug!("{draw_commands:?}");
 
             self.primitive_pipeline
-                .draw(&draw_commands, queue, &mut pass, &self.camera_buffer.bind_group)
+                .draw(&draw_commands, queue, &mut pass, &self.camera_buffer.bind_group);
         };
 
         queue.submit(std::iter::once(encoder.finish()));
