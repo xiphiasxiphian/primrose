@@ -1,6 +1,10 @@
 use strum::EnumCount;
 
-use crate::jade::ecs::{query::QueryParam, system::{IntoSystem, System, SystemParam}, world::World};
+use crate::jade::ecs::{
+    query::QueryParam,
+    system::{IntoSystem, System, SystemParam},
+    world::World,
+};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, EnumCount)]
 pub enum Stage

@@ -3,9 +3,18 @@ pub mod manager;
 use std::{cell::RefCell, rc::Rc};
 
 use crate::jade::{
-    camera::Camera, ecs::{
-        entity::EntityBuilder, query::QueryParam, resource::Resource, system::{IntoSystem, SystemParam, scheduler::{Scheduler, Stage}}, world::World,
-    }, input::InputState,
+    camera::Camera,
+    ecs::{
+        entity::EntityBuilder,
+        query::QueryParam,
+        resource::Resource,
+        system::{
+            IntoSystem, SystemParam,
+            scheduler::{Scheduler, Stage},
+        },
+        world::World,
+    },
+    input::InputState,
 };
 
 pub struct Scene
@@ -50,7 +59,10 @@ impl Scene
         self
     }
 
-    pub fn add_system<Q: SystemParam, S: IntoSystem<Q>>(&mut self, stage: Stage, system: S) { self.scheduler.add_system(stage, system); }
+    pub fn add_system<Q: SystemParam, S: IntoSystem<Q>>(&mut self, stage: Stage, system: S)
+    {
+        self.scheduler.add_system(stage, system);
+    }
 }
 
 pub struct EngineState

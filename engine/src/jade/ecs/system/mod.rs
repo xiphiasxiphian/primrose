@@ -2,7 +2,10 @@ pub mod scheduler;
 
 use std::marker::PhantomData;
 
-use crate::jade::ecs::{query::{Query, QueryParam}, world::{World}};
+use crate::jade::ecs::{
+    query::{Query, QueryParam},
+    world::World,
+};
 
 pub trait System: 'static
 {
@@ -18,15 +21,13 @@ pub trait SystemParam
 impl SystemParam for &mut World
 {
     type Param<'a> = &'a mut World;
-    fn fetch<'a>(world: &'a mut World) -> Self::Param<'a> {
-        world
-    }
+    fn fetch<'a>(world: &'a mut World) -> Self::Param<'a> { world }
 }
 
 pub struct FunctionSystem<F, P>
 {
     func: F,
-    _pd: PhantomData<fn(P)>
+    _pd: PhantomData<fn(P)>,
 }
 
 impl<F, S> System for FunctionSystem<F, S>
@@ -54,7 +55,8 @@ where
 {
     type System = FunctionSystem<F, S>;
 
-    fn into_system(self) -> Self::System {
+    fn into_system(self) -> Self::System
+    {
         FunctionSystem {
             func: self,
             _pd: PhantomData,

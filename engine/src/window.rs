@@ -14,11 +14,21 @@ use winit::{
 };
 
 use crate::{
-    clock::Clock, handler::WindowHandler, jade::{
-        audio::SoundHandler, ecs::{
-            components::{renderable::RenderInfo, transform::Transform}, query::Query, system::scheduler::Stage, world::World,
-        }, input::InputState, scene::manager::SceneManager,
-    }, renderer::Renderer, util::{
+    clock::Clock,
+    handler::WindowHandler,
+    jade::{
+        audio::SoundHandler,
+        ecs::{
+            components::{renderable::RenderInfo, transform::Transform},
+            query::Query,
+            system::scheduler::Stage,
+            world::World,
+        },
+        input::InputState,
+        scene::manager::SceneManager,
+    },
+    renderer::Renderer,
+    util::{
         assets::assetpool::AssetPool,
         settings::window::{FullscreenOptions, WindowDescriptor},
     },

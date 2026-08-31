@@ -1,5 +1,8 @@
 use engine::{
-    clock::Clock, glam::DVec2, jade::ecs::{components::renderable::RenderInfo, query::Query, world::World}, proc_macros::Component,
+    clock::Clock,
+    glam::DVec2,
+    jade::ecs::{components::renderable::RenderInfo, query::Query, world::World},
+    proc_macros::Component,
 };
 
 #[derive(Clone, Copy, Debug)]

@@ -1,10 +1,19 @@
 use std::{
-    any::{Any, TypeId}, cell::RefCell, collections::{HashMap, hash_map::Entry}, rc::Rc,
+    any::{Any, TypeId},
+    cell::RefCell,
+    collections::{HashMap, hash_map::Entry},
+    rc::Rc,
 };
 
-use crate::jade::{ecs::{
-    components::{Archetype, Column}, entity::{Entity, EntityAllocator, EntityBuilder}, query::{Query, QueryParam}, resource::Resource,
-}, scene::manager::SceneManager};
+use crate::jade::{
+    ecs::{
+        components::{Archetype, Column},
+        entity::{Entity, EntityAllocator, EntityBuilder},
+        query::{Query, QueryParam},
+        resource::Resource,
+    },
+    scene::manager::SceneManager,
+};
 
 type EntityLoc = (usize, usize);
 

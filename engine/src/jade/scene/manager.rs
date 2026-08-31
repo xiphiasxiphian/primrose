@@ -1,6 +1,15 @@
-use std::{any::{Any, TypeId}, cell::RefCell, collections::{HashMap, hash_map::Entry}, rc::Rc};
+use std::{
+    any::{Any, TypeId},
+    cell::RefCell,
+    collections::{HashMap, hash_map::Entry},
+    rc::Rc,
+};
 
-use crate::{clock::Clock, jade::{audio::SoundHandler, ecs::resource::Resource, input::InputState, scene::Scene}, util::assets::{ManagedResource, assetpool::AssetPool}};
+use crate::{
+    clock::Clock,
+    jade::{audio::SoundHandler, ecs::resource::Resource, input::InputState, scene::Scene},
+    util::assets::{ManagedResource, assetpool::AssetPool},
+};
 
 pub type ManagedScene = ManagedResource<Scene>;
 
@@ -33,10 +42,7 @@ impl SceneManager
 
     pub fn with_global<R: Resource>(mut self, resource: R) -> Self
     {
-        self.global_resources.insert(
-            TypeId::of::<R>(),
-            Box::new(resource),
-        );
+        self.global_resources.insert(TypeId::of::<R>(), Box::new(resource));
 
         self
     }
