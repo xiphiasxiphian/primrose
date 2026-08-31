@@ -1,9 +1,15 @@
+#![allow(clippy::panic, clippy::unwrap_used, clippy::expect_used)] // using panics in proc macros is standard
+
 use proc_macro::TokenStream;
 use proc_macro_crate::{FoundCrate, crate_name};
 use proc_macro2::Span;
 use quote::quote;
 use syn::{DeriveInput, Ident, parse_macro_input};
 
+/// Derive the Component trait
+///
+/// # Panics
+/// Panics if the engine crate isn't avaliable to pull the trait from
 #[proc_macro_derive(Component)]
 pub fn derive_component(input: TokenStream) -> TokenStream
 {
@@ -29,6 +35,10 @@ pub fn derive_component(input: TokenStream) -> TokenStream
     output.into()
 }
 
+/// Derive the Resource trait
+///
+/// # Panics
+/// Panics if the engine crate isn't avaliable to pull the trait from
 #[proc_macro_derive(Resource)]
 pub fn derive_resource(input: TokenStream) -> TokenStream
 {

@@ -6,6 +6,9 @@ edition = "2024"
 [features]
 derive = []
 
+[lints]
+workspace = true
+
 [dependencies]
 wgpu = "30.0.0"
 bytemuck = { version = "1", features = ["derive"] }
