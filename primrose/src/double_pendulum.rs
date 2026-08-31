@@ -159,10 +159,13 @@ pub fn double_pendulum_system(
         let line_color = [0.0, 1.0, 0.0, 1.0];
 
         let node_size = 30.0;
+        let line_thickness = 7.0;
 
         // render pendulum
-        render.line(transform.pos, node1, 4.0, line_color);
-        render.line(node1, node2, 4.0, line_color);
+        render.line(transform.pos, node1, line_thickness, line_color);
+        render.line(node1, node2, line_thickness, line_color);
+
+        render.circle(transform.pos, node_size / 2.0, [0.0, 0.0, 1.0, 1.0], 64);
 
         render.circle(node1, node_size, node_color, 64);
         render.circle(node2, node_size, node_color, 64);
