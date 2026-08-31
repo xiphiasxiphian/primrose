@@ -2,7 +2,6 @@ pub mod scheduler;
 
 use std::marker::PhantomData;
 
-use wgpu::wgc::global::Global;
 
 use crate::jade::{
     ecs::{query::QueryParam, world::World},

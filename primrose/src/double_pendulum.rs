@@ -1,14 +1,12 @@
 use engine::{
-    clock::Clock,
     glam::DVec2,
     jade::{
         ecs::{
             components::{
                 renderable::RenderInfo,
-                transform::{self, Transform},
+                transform::Transform,
             },
             query::Query,
-            world::World,
         },
         scene::manager::GlobalResources,
     },

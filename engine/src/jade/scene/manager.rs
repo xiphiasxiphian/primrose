@@ -1,18 +1,16 @@
 use std::{
-    any::{Any, TypeId},
     cell::RefCell,
     collections::{HashMap, hash_map::Entry},
     rc::Rc,
 };
 
-use wgpu::wgc::global::Global;
 
 use crate::{
     clock::Clock,
     jade::{
         audio::SoundHandler,
         ecs::{
-            components::renderable::RenderInfo, query::Query, resource::Resource, system::scheduler::Stage,
+            components::renderable::RenderInfo, query::Query, system::scheduler::Stage,
             world::World,
         },
         input::InputState,

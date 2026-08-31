@@ -4,7 +4,6 @@ use log::info;
 use wgpu::{
     CurrentSurfaceTexture, Device, DeviceDescriptor, ExperimentalFeatures, Features, Instance, Limits, MemoryHints,
     PowerPreference, Queue, RequestAdapterOptions, Surface, SurfaceColorSpace, SurfaceConfiguration, TextureUsages,
-    wgc::global::Global,
 };
 use winit::{
     application::ApplicationHandler,
@@ -21,15 +20,10 @@ use crate::{
         audio::SoundHandler,
         ecs::{
             components::{renderable::RenderInfo, transform::Transform},
-            query::Query,
             system::scheduler::Stage,
-            world::World,
         },
         input::InputState,
-        scene::{
-            Scene,
-            manager::{GlobalResources, SceneManager},
-        },
+        scene::manager::{GlobalResources, SceneManager},
     },
     renderer::Renderer,
     util::{
