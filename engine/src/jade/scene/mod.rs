@@ -52,7 +52,6 @@ impl Scene
 
     // Wrap the scheduler functions as they are linked to the world
 
-
     pub fn with_system<Q: SystemParam, S: IntoSystem<Q>>(mut self, stage: Stage, system: S) -> Self
     {
         self.scheduler.add_system(stage, system);

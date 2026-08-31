@@ -2,7 +2,9 @@ use std::{cell::RefCell, rc::Rc, sync::Arc};
 
 use log::info;
 use wgpu::{
-    CurrentSurfaceTexture, Device, DeviceDescriptor, ExperimentalFeatures, Features, Instance, Limits, MemoryHints, PowerPreference, Queue, RequestAdapterOptions, Surface, SurfaceColorSpace, SurfaceConfiguration, TextureUsages, wgc::global::Global,
+    CurrentSurfaceTexture, Device, DeviceDescriptor, ExperimentalFeatures, Features, Instance, Limits, MemoryHints,
+    PowerPreference, Queue, RequestAdapterOptions, Surface, SurfaceColorSpace, SurfaceConfiguration, TextureUsages,
+    wgc::global::Global,
 };
 use winit::{
     application::ApplicationHandler,
@@ -13,14 +15,24 @@ use winit::{
 };
 
 use crate::{
-    clock::Clock, handler::WindowHandler, jade::{
-        audio::SoundHandler, ecs::{
+    clock::Clock,
+    handler::WindowHandler,
+    jade::{
+        audio::SoundHandler,
+        ecs::{
             components::{renderable::RenderInfo, transform::Transform},
             query::Query,
             system::scheduler::Stage,
             world::World,
-        }, input::InputState, scene::{Scene, manager::{GlobalResources, SceneManager}},
-    }, renderer::Renderer, util::{
+        },
+        input::InputState,
+        scene::{
+            Scene,
+            manager::{GlobalResources, SceneManager},
+        },
+    },
+    renderer::Renderer,
+    util::{
         assets::assetpool::AssetPool,
         settings::window::{FullscreenOptions, WindowDescriptor},
     },
@@ -73,7 +85,6 @@ impl RunningState
         };
 
         self.scene_manager.run_stage(Stage::PostUpdate);
-
 
         let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
         self.scene_manager.with_current_scene(|scene| {
@@ -232,7 +243,13 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
         let scene_manager = SceneManager::preloaded(
             |x: (f32, f32), y: &mut AssetPool| self.handler.scenes(x, y),
             H::initial_scene(),
-            GlobalResources { dims: self.descriptor.dims, clock, assetpool: asset_pool, input: scene_input, sound_handler }
+            GlobalResources {
+                dims: self.descriptor.dims,
+                clock,
+                assetpool: asset_pool,
+                input: scene_input,
+                sound_handler,
+            },
         )
         .expect("Failed to init scene manager");
 

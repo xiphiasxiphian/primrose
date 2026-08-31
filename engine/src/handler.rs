@@ -15,10 +15,6 @@ pub trait WindowHandler: 'static
     where
         Self: Sized;
 
-    fn scenes(
-        &mut self,
-        dims: (f32, f32),
-        _assetpool: &mut AssetPool,
-    ) -> HashMap<&'static str, ManagedScene>;
+    fn scenes(&mut self, dims: (f32, f32), _assetpool: &mut AssetPool) -> HashMap<&'static str, ManagedScene>;
     fn initial_scene() -> &'static str;
 }

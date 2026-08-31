@@ -6,7 +6,7 @@ use crate::renderer::mesh::Mesh;
 type Position = DVec2;
 type Size = DVec2;
 
-#[derive(Debug, Default, PartialEq, Copy, Clone, Component)]
+#[derive(Debug, Default, PartialEq, Copy, Clone, Component, derive_new::new)]
 pub struct Transform
 {
     pub pos: Position,

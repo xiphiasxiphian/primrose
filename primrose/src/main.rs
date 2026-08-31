@@ -3,9 +3,13 @@ mod double_pendulum;
 use std::collections::HashMap;
 
 use engine::{
+    glam::DVec2,
     handler::WindowHandler,
     jade::{
-        ecs::components::{renderable::RenderInfo, transform::Transform},
+        ecs::{
+            components::{renderable::RenderInfo, transform::Transform},
+            system::scheduler::Stage,
+        },
         scene::{Scene, manager::ManagedScene},
     },
     util::{
@@ -15,7 +19,7 @@ use engine::{
     window::Window,
 };
 
-use crate::double_pendulum::DoublePendulum;
+use crate::double_pendulum::{DoublePendulum, double_pendulum_system};
 
 struct Handler;
 
@@ -38,21 +42,22 @@ impl WindowHandler for Handler
         []
     }
 
-    fn scenes(
-        &mut self,
-        dims: (f32, f32),
-        assetpool: &mut AssetPool,
-    ) -> HashMap<&'static str, ManagedScene>
+    fn scenes(&mut self, dims: (f32, f32), assetpool: &mut AssetPool) -> HashMap<&'static str, ManagedScene>
     {
         let _texture = assetpool.get_texture("grass").unwrap();
         [(
             "double_pendulum",
-            ManagedScene::eager(Scene::new(dims).with_entity(|x| {
-                x.with_component(Transform::default())
-                    .with_component(RenderInfo::default())
-                    .with_component(DoublePendulum::default())
-            })),
-        )].into()
+            ManagedScene::eager(
+                Scene::new(dims)
+                    .with_entity(|x| {
+                        x.with_component(Transform::new(DVec2::new(0.0, -200.0), DVec2::default()))
+                            .with_component(RenderInfo::default())
+                            .with_component(DoublePendulum::default())
+                    })
+                    .with_system(Stage::Update, double_pendulum_system),
+            ),
+        )]
+        .into()
     }
 
     fn initial_scene() -> &'static str { "double_pendulum" }

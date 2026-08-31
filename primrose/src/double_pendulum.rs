@@ -1,7 +1,17 @@
 use engine::{
     clock::Clock,
     glam::DVec2,
-    jade::ecs::{components::renderable::RenderInfo, world::World},
+    jade::{
+        ecs::{
+            components::{
+                renderable::RenderInfo,
+                transform::{self, Transform},
+            },
+            query::Query,
+            world::World,
+        },
+        scene::manager::GlobalResources,
+    },
     proc_macros::Component,
 };
 
@@ -32,16 +42,16 @@ impl Default for DoublePendulum
     {
         DoublePendulum {
             state: State {
-                theta1: 45.0,
-                theta2: 45.0,
+                theta1: 90.0_f64.to_radians(),
+                theta2: 90.0_f64.to_radians(),
                 omega1: 0.0,
                 omega2: 0.0,
             },
-            l1: 6.0,
-            l2: 6.0,
-            m1: 1.0,
-            m2: 1.0,
-            g: 9.81,
+            l1: 200.0,
+            l2: 200.0,
+            m1: 0.5,
+            m2: 0.5,
+            g: 1500.0,
             dampning: 0.0,
         }
     }
@@ -71,7 +81,7 @@ impl DoublePendulum
 
         let n1 = (-g * (2.0 * m1 + m2) * theta1.sin())
             - (m2 * g * (theta1 - 2.0 * theta2).sin())
-            - (2.0 * delta.sin() * m2 * omega2.powi(2) * l2 + omega1.powi(2) * l1 * delta.cos());
+            - (2.0 * delta.sin() * m2 * (omega2.powi(2) * l2 + omega1.powi(2) * l1 * delta.cos()));
         let d1 = l1 * (2.0 * m1 + m2 - m2 * (2.0 * theta1 - 2.0 * theta2).cos());
         let alpha1 = n1 / d1;
 
@@ -123,9 +133,9 @@ impl DoublePendulum
         self.state.omega2 += (dt / 6.0) * (d_om2_1 + 2.0 * d_om2_2 + 2.0 * d_om2_3 + d_om2_4);
     }
 
-    pub fn get_node_positions(&self) -> (DVec2, DVec2)
+    pub fn get_node_positions(&self, base: DVec2) -> (DVec2, DVec2)
     {
-        let node1 = DVec2::new(self.state.theta1.sin(), self.state.theta1.cos()) * self.l1;
+        let node1 = base + DVec2::new(self.state.theta1.sin(), self.state.theta1.cos()) * self.l1;
 
         let node2 = node1 + DVec2::new(self.state.theta2.sin(), self.state.theta2.cos()) * self.l2;
 
@@ -133,29 +143,30 @@ impl DoublePendulum
     }
 }
 
-fn double_pendulum_system(world: &mut World)
+pub fn double_pendulum_system(
+    query: Query<(&mut DoublePendulum, &mut RenderInfo, &Transform)>,
+    globals: &mut GlobalResources,
+)
 {
-    let query = world.query::<(&mut DoublePendulum, &mut RenderInfo)>();
-    let Some(clock) = world.resource::<Clock>()
-    else
+    for (double_pen, render, transform) in query.iter()
     {
-        return;
-    };
+        for _ in 0..5
+        {
+            double_pen.step(globals.clock.dt() / 5.0)
+        }
 
-    for (double_pen, render) in query.iter()
-    {
-        double_pen.step(clock.dt());
-
-        let (node1, node2) = double_pen.get_node_positions();
+        let (node1, node2) = double_pen.get_node_positions(transform.pos);
 
         let node_color = [1.0, 0.0, 0.0, 1.0];
         let line_color = [0.0, 1.0, 0.0, 1.0];
 
-        // render pendulum
-        render.line(DVec2::ZERO, node1, 1.0, line_color);
-        render.line(node1, node2, 1.0, line_color);
+        let node_size = 30.0;
 
-        render.circle(node1, 3.0, node_color, 64);
-        render.circle(node2, 3.0, node_color, 64);
+        // render pendulum
+        render.line(transform.pos, node1, 4.0, line_color);
+        render.line(node1, node2, 4.0, line_color);
+
+        render.circle(node1, node_size, node_color, 64);
+        render.circle(node2, node_size, node_color, 64);
     }
 }

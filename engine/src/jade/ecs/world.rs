@@ -4,11 +4,11 @@ use std::{
 };
 
 use crate::jade::ecs::{
-        components::{Archetype, Column},
-        entity::{Entity, EntityAllocator, EntityBuilder},
-        query::{Query, QueryParam},
-        resource::Resource,
-    };
+    components::{Archetype, Column},
+    entity::{Entity, EntityAllocator, EntityBuilder},
+    query::{Query, QueryParam},
+    resource::Resource,
+};
 
 type EntityLoc = (usize, usize);
 

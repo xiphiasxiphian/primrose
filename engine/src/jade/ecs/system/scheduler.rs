@@ -1,9 +1,12 @@
 use strum::EnumCount;
 
-use crate::jade::{ecs::{
-    system::{IntoSystem, System, SystemParam},
-    world::World,
-}, scene::manager::GlobalResources};
+use crate::jade::{
+    ecs::{
+        system::{IntoSystem, System, SystemParam},
+        world::World,
+    },
+    scene::manager::GlobalResources,
+};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, EnumCount)]
 pub enum Stage

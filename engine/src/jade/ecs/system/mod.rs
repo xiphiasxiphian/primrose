@@ -4,10 +4,10 @@ use std::marker::PhantomData;
 
 use wgpu::wgc::global::Global;
 
-use crate::jade::{ecs::{
-    query::QueryParam,
-    world::World,
-}, scene::manager::GlobalResources};
+use crate::jade::{
+    ecs::{query::QueryParam, world::World},
+    scene::manager::GlobalResources,
+};
 
 pub trait System: 'static
 {
@@ -53,8 +53,8 @@ pub trait IntoSystem<Q>
 impl<F, S> IntoSystem<S> for F
 where
     S: SystemParam + 'static,
-    F: for <'a, 'b> FnMut(S::Param<'a>, &'b mut GlobalResources) + 'static,
-    F: for <'b> FnMut(S, &'b mut GlobalResources)
+    F: for<'a, 'b> FnMut(S::Param<'a>, &'b mut GlobalResources) + 'static,
+    F: for<'b> FnMut(S, &'b mut GlobalResources),
 {
     type System = FunctionSystem<F, S>;
 
