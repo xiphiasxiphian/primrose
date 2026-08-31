@@ -30,7 +30,6 @@ pub struct Scene
 
 impl Scene
 {
-    #[must_use]
     pub fn new(viewport_dims: (f32, f32)) -> Self
     {
         Self {

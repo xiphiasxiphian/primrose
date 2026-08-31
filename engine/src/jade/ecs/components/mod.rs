@@ -19,7 +19,6 @@ pub struct Column
 
 impl Column
 {
-    #[must_use]
     pub fn new(tid: TypeId) -> Self
     {
         Self {
@@ -30,7 +29,6 @@ impl Column
 
     pub fn push<T: Component>(&mut self, value: T) { self.data.push(UnsafeCell::new(Box::new(value))); }
 
-    #[must_use]
     pub fn get<T: Component>(&self, row: usize) -> Option<&T>
     {
         // SAFETY: shared reference, no mutation possible through &.
@@ -41,7 +39,6 @@ impl Column
     /// SAFETY: caller must guarantee no other
     /// reference to this (type, row) pair exists simultaneously
     #[expect(clippy::mut_from_ref, reason = "See safety comments")]
-    #[must_use]
     pub unsafe fn get_mut<T: Component>(&self, row: usize) -> Option<&mut T>
     {
         // SAFETY: UnsafeCell::get() gives *mut, which we dereference to &mut.
@@ -53,7 +50,6 @@ impl Column
 
     pub fn swap_remove(&mut self, row: usize) { self.data.swap_remove(row); }
 
-    #[must_use]
     pub fn len(&self) -> usize { self.data.len() }
 }
 
@@ -67,7 +63,6 @@ pub struct Archetype
 
 impl Archetype
 {
-    #[must_use]
     pub fn entities(&self) -> &[Entity] { &self.entities }
 
     pub fn matches<'a, I>(&self, types: I) -> bool
@@ -77,7 +72,6 @@ impl Archetype
         types.into_iter().all(|t| self.component_types.contains(t))
     }
 
-    #[must_use]
     pub fn get_entry<E: Component + 'static>(&self, row: usize) -> Option<&E>
     {
         self.columns.get(&TypeId::of::<E>())?.get::<E>(row)
@@ -87,7 +81,6 @@ impl Archetype
     /// 1. No other reference to this component type+row exists
     /// 2. `TypeId` does not appear twice as mutable in the same query
     /// Both are enforced by `validate_query_params` / `assert_all_disjoint`
-    #[must_use]
     pub unsafe fn get_entry_mut<E: Component + 'static>(&self, row: usize) -> Option<&mut E>
     {
         unsafe { self.columns.get(&TypeId::of::<E>())?.get_mut::<E>(row) }

@@ -25,7 +25,6 @@ impl Default for WindowDescriptor
 
 impl WindowDescriptor
 {
-    #[must_use]
     pub fn get_fullscreen(&self) -> Option<Fullscreen>
     {
         self.fullscreen_options

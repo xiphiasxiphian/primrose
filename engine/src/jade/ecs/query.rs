@@ -130,7 +130,6 @@ impl<'a, Q: QueryParam, I: Iterator<Item = &'a Archetype>> Iterator for QueryIte
 
 impl<'a, T: QueryParam> Query<'a, T>
 {
-    #[must_use]
     pub fn new(world: &'a World) -> Self
     {
         Self {

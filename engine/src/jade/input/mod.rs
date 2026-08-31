@@ -34,7 +34,6 @@ impl Default for InputState {
 
 impl InputState
 {
-    #[must_use]
     pub fn new() -> Self
     {
         Self {
@@ -104,24 +103,17 @@ impl InputState
         }
     }
 
-    #[must_use]
     pub fn is_key_down(&self, key: Key) -> bool { self.keys_down[key as usize] }
 
-    #[must_use]
     pub fn is_key_up(&self, key: Key) -> bool { self.keys_up[key as usize] }
 
-    #[must_use]
     pub fn is_key_held(&self, key: Key) -> bool { self.keys_held[key as usize] }
 
-    #[must_use]
     pub fn is_mouse_button_down(&self, button: MouseButton) -> bool { self.mouse_down[button as usize] }
 
-    #[must_use]
     pub fn is_mouse_button_up(&self, button: MouseButton) -> bool { self.mouse_up[button as usize] }
 
-    #[must_use]
     pub fn mouse_pos(&self) -> MousePos { self.mouse_pos }
 
-    #[must_use]
     pub fn mouse_delta(&self) -> MousePos { self.mouse_delta }
 }
