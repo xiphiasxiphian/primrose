@@ -12,13 +12,13 @@ pub trait System: 'static
 pub trait SystemParam
 {
     type Param<'a>;
-    fn fetch<'a>(world: &'a mut World) -> Self::Param<'a>;
+    fn fetch(world: &mut World) -> Self::Param<'_>;
 }
 
 impl SystemParam for &'static mut World
 {
     type Param<'a> = &'a mut World;
-    fn fetch<'a>(world: &'a mut World) -> Self::Param<'a> { world }
+    fn fetch(world: &mut World) -> Self::Param<'_> { world }
 }
 
 pub struct FunctionSystem<F, P>
@@ -35,7 +35,7 @@ where
     fn run(&mut self, world: &mut World, globals: &mut GlobalResources)
     {
         let param = S::fetch(world);
-        (self.func)(param, globals)
+        (self.func)(param, globals);
     }
 }
 

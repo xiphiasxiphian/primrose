@@ -72,7 +72,7 @@ impl RunningState
 
             status =>
             {
-                log::warn!("Dropped frame: {:?}", status);
+                log::warn!("Dropped frame: {status:?}");
                 return;
             }
         };

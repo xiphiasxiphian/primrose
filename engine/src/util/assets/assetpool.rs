@@ -50,7 +50,7 @@ impl AssetPool
             let texture = bytes_resource.map(move |raw_bytes| {
                 Texture::from_bytes(raw_bytes, &device_clone, &queue_clone, &layout_clone).map_or_else(
                     |e| {
-                        log::error!("Failed to load texture {}. Raw Error: {}", name, e);
+                        log::error!("Failed to load texture {name}. Raw Error: {e}");
                         default_tex_clone
                     },
                     Arc::new,
@@ -58,7 +58,7 @@ impl AssetPool
             });
 
             pool.textures.insert(name, texture);
-            log::info!("Queued texture: {}", name);
+            log::info!("Queued texture: {name}");
         }
 
         for (name, bytes_resource) in sounds
@@ -68,13 +68,13 @@ impl AssetPool
             let sound = bytes_resource.map(move |raw_bytes| {
                 let cursor = std::io::Cursor::new(raw_bytes);
                 StaticSoundData::from_cursor(cursor).unwrap_or_else(|e| {
-                    log::error!("Failed to load sound {}. Raw Error: {}", name, e);
+                    log::error!("Failed to load sound {name}. Raw Error: {e}");
                     default_snd_clone
                 })
             });
 
             pool.sounds.insert(name, sound);
-            log::info!("Queued sound: {}", name);
+            log::info!("Queued sound: {name}");
         }
 
         Ok(pool)

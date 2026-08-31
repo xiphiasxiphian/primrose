@@ -55,6 +55,7 @@ impl World
         self.resources.insert(TypeId::of::<R>(), Box::new(resource));
     }
 
+    #[must_use]
     pub fn resource<R: Resource>(&self) -> Option<&R>
     {
         self.resources
@@ -82,6 +83,7 @@ impl World
 
     pub fn archetypes_iter(&self) -> impl Iterator<Item = &Archetype> { self.archetypes.iter() }
 
+    #[must_use]
     pub fn query<P: QueryParam>(&self) -> Query<'_, P> { Query::new(self) }
 
     pub fn find_or_create_archetype(&mut self, type_ids: &[TypeId]) -> usize
@@ -94,7 +96,7 @@ impl World
         let columns = type_ids.iter().map(|&tid| (tid, Column::new(tid))).collect();
 
         self.archetypes
-            .push(Archetype::new(type_ids.iter().copied().collect(), vec![], columns));
+            .push(Archetype::new(type_ids.to_vec(), vec![], columns));
 
         self.archetypes.len() - 1
     }

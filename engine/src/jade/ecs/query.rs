@@ -15,7 +15,7 @@ pub struct Query<'a, T: QueryParam>
 impl<Q: QueryParam> SystemParam for Query<'static, Q>
 {
     type Param<'a> = Query<'a, Q>;
-    fn fetch<'a>(world: &'a mut World) -> Self::Param<'a> { world.query::<Q>() }
+    fn fetch(world: &mut World) -> Self::Param<'_> { world.query::<Q>() }
 }
 
 mod private
@@ -28,7 +28,7 @@ pub trait QueryParam: private::Sealed
     type Item<'a>;
 
     fn type_ids() -> Vec<(TypeId, bool)>;
-    unsafe fn fetch<'a>(archetype: &'a Archetype, row: usize) -> Option<Self::Item<'a>>;
+    unsafe fn fetch(archetype: &Archetype, row: usize) -> Option<Self::Item<'_>>;
 }
 
 impl<A: Component> private::Sealed for &A {}
@@ -38,7 +38,7 @@ impl<A: Component> QueryParam for &A
 
     fn type_ids() -> Vec<(TypeId, bool)> { vec![(TypeId::of::<A>(), false)] }
 
-    unsafe fn fetch<'a>(archetype: &'a Archetype, row: usize) -> Option<Self::Item<'a>>
+    unsafe fn fetch(archetype: &Archetype, row: usize) -> Option<Self::Item<'_>>
     {
         // SAFETY:
         // - Shared Immutable References are safe by default
@@ -53,7 +53,7 @@ impl<A: Component> QueryParam for &mut A
 
     fn type_ids() -> Vec<(TypeId, bool)> { vec![(TypeId::of::<A>(), true)] }
 
-    unsafe fn fetch<'a>(archetype: &'a Archetype, row: usize) -> Option<Self::Item<'a>>
+    unsafe fn fetch(archetype: &Archetype, row: usize) -> Option<Self::Item<'_>>
     {
         // SAFETY:
         // - Each TypeId maps to exactly one column (one Vec)
@@ -72,14 +72,12 @@ fn validate_query_params(type_ids: &[(TypeId, bool)])
     {
         assert!(
             !(*is_mut && seen_any.contains(tid)),
-            "Query: mutable access to {:?} conflicts with existing immutable access",
-            tid
+            "Query: mutable access to {tid:?} conflicts with existing immutable access"
         );
 
         assert!(
             !seen_mutable.contains(tid),
-            "Query: duplicate mutable access to {:?}",
-            tid,
+            "Query: duplicate mutable access to {tid:?}",
         );
 
         if *is_mut
@@ -132,6 +130,7 @@ impl<'a, Q: QueryParam, I: Iterator<Item = &'a Archetype>> Iterator for QueryIte
 
 impl<'a, T: QueryParam> Query<'a, T>
 {
+    #[must_use]
     pub fn new(world: &'a World) -> Self
     {
         Self {
@@ -167,7 +166,7 @@ macro_rules! impl_query_param_tuple {
                 ids
             }
 
-            unsafe fn fetch<'a>(arch: &'a Archetype, row: usize) -> Option<Self::Item<'a>> {
+            unsafe fn fetch(arch: &Archetype, row: usize) -> Option<Self::Item<'_>> {
                 unsafe {
                     Some((
                         $F::fetch(arch, row)?,

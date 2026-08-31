@@ -50,7 +50,7 @@ impl SceneManager
             current: initial_scene,
             globals,
         };
-        manager.with_current_scene(|x| Self::init_scene(x));
+        manager.with_current_scene(Self::init_scene);
 
         Some(manager)
     }

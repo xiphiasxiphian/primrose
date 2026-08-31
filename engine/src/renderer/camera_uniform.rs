@@ -2,7 +2,7 @@ use glam::Mat4;
 use wgpu::{
     BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, BindGroupLayoutDescriptor, BindGroupLayoutEntry,
     BindingType, Buffer, BufferBindingType, BufferUsages, Device, Queue, ShaderStages,
-    util::{BufferInitDescriptor, DeviceExt},
+    util::{BufferInitDescriptor, DeviceExt as _},
 };
 
 use crate::jade::camera::Camera;

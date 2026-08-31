@@ -131,7 +131,7 @@ impl Renderer
             cache: None,
         });
 
-        let primitive_pipeline = PrimitivePipeline::new(&device, &surface_format, &camera_buffer.layout);
+        let primitive_pipeline = PrimitivePipeline::new(device, &surface_format, &camera_buffer.layout);
 
         Self {
             texture_bind_group_layout,
@@ -171,7 +171,7 @@ impl Renderer
             // TODO: again this keying only works because assetpool. improve in future
             let key = Arc::as_ptr(texture);
 
-            let indices: Vec<u32> = mesh.indices.iter().map(|&i| i as u32).collect();
+            let indices: Vec<u32> = mesh.indices.iter().map(|&i| u32::from(i)).collect();
 
             self.batches
                 .entry(key)
@@ -219,16 +219,16 @@ impl Renderer
                 pass.draw_indexed(0..slice.0, 0, 0..1);
             }
 
-            log::debug!("{:?}", &draw_commands);
+            log::debug!("{:?}", draw_commands);
 
             self.primitive_pipeline
-                .draw(&draw_commands, queue, &mut pass, &self.camera_buffer.bind_group);
-        }
+                .draw(&draw_commands, queue, &mut pass, &self.camera_buffer.bind_group)
+        };
 
         queue.submit(std::iter::once(encoder.finish()));
     }
 
-    pub fn remove_batch(&mut self, texture: &Texture) { self.batches.remove(&(texture as *const Texture)); }
+    pub fn remove_batch(&mut self, texture: &Texture) { self.batches.remove(&std::ptr::from_ref::<Texture>(texture)); }
 
     pub fn texture_bind_group_layout(&self) -> &BindGroupLayout { &self.texture_bind_group_layout }
 }

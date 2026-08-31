@@ -104,7 +104,7 @@ impl DrawCommand
         });
 
         verts.extend((0..=segments).map(|i| {
-            let angle = (i as f64 / segments as f64) * std::f64::consts::TAU;
+            let angle = (f64::from(i) / f64::from(segments)) * std::f64::consts::TAU;
             let pos = center + DVec2::from_angle(angle) * radius;
 
             ColoredVertex {

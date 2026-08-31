@@ -42,6 +42,7 @@ where
 
     pub fn eager(value: T) -> Self { Self(ManagedResourceInner::Resolved(value)) }
 
+    #[must_use]
     pub fn lazy(f: Box<dyn FnOnce() -> T>) -> Self { Self(ManagedResourceInner::Lazy(f)) }
 
     pub fn map<F, O>(self, f: F) -> ManagedResource<O>

@@ -1,7 +1,7 @@
 #[cfg(not(target_arch = "wasm32"))]
 use std::path::Path;
 
-use image::{DynamicImage, GenericImageView, ImageError};
+use image::{DynamicImage, GenericImageView as _, ImageError};
 use wgpu::{
     BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, BindingResource, Device, Extent3d, Queue, Sampler,
     SamplerDescriptor, TexelCopyBufferLayout, TexelCopyTextureInfo, TextureDescriptor, TextureFormat, TextureUsages,
@@ -35,11 +35,11 @@ impl Texture
         let premultiplied: Vec<u8> = rgba
             .pixels()
             .flat_map(|p| {
-                let a = p[3] as f32 / 255.0;
+                let a = f32::from(p[3]) / 255.0;
                 [
-                    (p[0] as f32 * a) as u8,
-                    (p[1] as f32 * a) as u8,
-                    (p[2] as f32 * a) as u8,
+                    (f32::from(p[0]) * a) as u8,
+                    (f32::from(p[1]) * a) as u8,
+                    (f32::from(p[2]) * a) as u8,
                     p[3],
                 ]
             })

@@ -42,12 +42,12 @@ impl EntityAllocator
         self.free.push(entity.index);
     }
 
+    #[must_use]
     pub fn is_alive(&self, entity: Entity) -> bool
     {
         self.generations
             .get(entity.index as usize)
-            .map(|&g| g == entity.generation)
-            .unwrap_or(false)
+            .is_some_and(|&g| g == entity.generation)
     }
 }
 
@@ -75,6 +75,7 @@ impl<'a> EntityBuilder<'a>
         self
     }
 
+    #[must_use]
     pub fn build(self) -> Entity
     {
         let type_ids = self.components.iter().map(|&(t, _)| t).collect::<Vec<_>>();
