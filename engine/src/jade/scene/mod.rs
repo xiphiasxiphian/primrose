@@ -6,6 +6,7 @@ use crate::jade::{
     camera::Camera,
     ecs::{
         entity::EntityBuilder,
+        query::QueryParam,
         resource::Resource,
         system::{
             IntoSystem, SystemParam,

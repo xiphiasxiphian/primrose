@@ -1,6 +1,7 @@
 use strum::EnumCount;
 
 use crate::jade::ecs::{
+    query::QueryParam,
     system::{IntoSystem, System, SystemParam},
     world::World,
 };
