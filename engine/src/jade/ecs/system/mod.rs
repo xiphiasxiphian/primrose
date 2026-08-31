@@ -3,7 +3,7 @@ pub mod scheduler;
 use std::marker::PhantomData;
 
 use crate::jade::ecs::{
-    query::{Query, QueryParam},
+    query::QueryParam,
     world::World,
 };
 

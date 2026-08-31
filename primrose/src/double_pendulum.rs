@@ -1,7 +1,7 @@
 use engine::{
     clock::Clock,
     glam::DVec2,
-    jade::ecs::{components::renderable::RenderInfo, query::Query, world::World},
+    jade::ecs::{components::renderable::RenderInfo, world::World},
     proc_macros::Component,
 };
 
