@@ -1,4 +1,4 @@
-use winit::window::Fullscreen;
+use winit::{dpi::LogicalSize, window::{Fullscreen, WindowAttributes}};
 
 use crate::jade::input::key::Key;
 
@@ -29,6 +29,17 @@ impl WindowDescriptor
     {
         self.fullscreen_options
             .and_then(|x| x.on_start.then_some(Fullscreen::Borderless(None)))
+    }
+}
+
+impl From<WindowDescriptor> for WindowAttributes
+{
+    fn from(descriptor: WindowDescriptor) -> Self
+    {
+        WindowAttributes::default()
+            .with_title(descriptor.title)
+            .with_inner_size(LogicalSize::new(descriptor.dims.0, descriptor.dims.1))
+            .with_fullscreen(descriptor.get_fullscreen())
     }
 }
 

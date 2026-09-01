@@ -169,12 +169,7 @@ impl<H: WindowHandler> ApplicationHandler for Window<H>
 
         let window = Arc::new(
             event_loop
-                .create_window(
-                    WindowAttributes::default()
-                        .with_title(self.descriptor.title)
-                        .with_inner_size(LogicalSize::new(self.descriptor.dims.0, self.descriptor.dims.1))
-                        .with_fullscreen(self.descriptor.get_fullscreen()),
-                )
+                .create_window(self.descriptor.into())
                 .expect("Failed to create window"),
         );
 
