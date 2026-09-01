@@ -22,7 +22,6 @@ impl Default for Clock
 
 impl Clock
 {
-
     pub fn dt(&self) -> f64 { self.dt }
 
     pub(crate) fn tick(&mut self) -> f64

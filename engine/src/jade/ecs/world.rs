@@ -93,8 +93,7 @@ impl World
 
         let columns = type_ids.iter().map(|&tid| (tid, Column::new(tid))).collect();
 
-        self.archetypes
-            .push(Archetype::new(type_ids.to_vec(), vec![], columns));
+        self.archetypes.push(Archetype::new(type_ids.to_vec(), vec![], columns));
 
         self.archetypes.len() - 1
     }

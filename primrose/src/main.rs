@@ -71,9 +71,5 @@ impl WindowHandler for Handler
 fn main()
 {
     env_logger::init();
-    Window::run(
-        Handler,
-        &WindowDescriptor::default()
-            .with_title("Primrose"),
-    );
+    Window::run(Handler, &WindowDescriptor::default().with_title("Primrose"));
 }

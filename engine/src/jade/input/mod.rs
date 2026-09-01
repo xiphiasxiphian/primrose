@@ -26,10 +26,9 @@ pub struct InputState
     mouse_up: [bool; MouseButton::COUNT],
 }
 
-impl Default for InputState {
-    fn default() -> Self {
-        Self::new()
-    }
+impl Default for InputState
+{
+    fn default() -> Self { Self::new() }
 }
 
 impl InputState

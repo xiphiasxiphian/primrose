@@ -1,6 +1,9 @@
 use color_eyre::eyre;
 use proc_macros::WithBuilder;
-use winit::{dpi::LogicalSize, window::{Fullscreen, Icon, WindowAttributes}};
+use winit::{
+    dpi::LogicalSize,
+    window::{Fullscreen, Icon, WindowAttributes},
+};
 
 use crate::jade::input::key::Key;
 
@@ -9,7 +12,11 @@ pub struct WindowDescriptor
 {
     pub title: &'static str,
     pub dims: (u32, u32),
+
+    #[builder(into_some)]
     pub fullscreen_options: Option<FullscreenOptions>,
+
+    #[builder(into_some)]
     pub icon: Option<&'static str>,
 }
 
@@ -51,10 +58,15 @@ impl WindowDescriptor
 
     pub fn get_icon(&self) -> Option<Icon>
     {
-        self.icon.and_then(|path| WindowDescriptor::load_icon(path).map_or_else(|x| {
-                log::warn!("Failed to load icon at {}: {}", self.icon.unwrap_or("{unknown}"), x);
-                None
-            }, |x| Some(x)))
+        self.icon.and_then(|path| {
+            WindowDescriptor::load_icon(path).map_or_else(
+                |x| {
+                    log::warn!("Failed to load icon at {}: {}", self.icon.unwrap_or("{unknown}"), x);
+                    None
+                },
+                |x| Some(x),
+            )
+        })
     }
 }
 

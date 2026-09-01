@@ -44,7 +44,10 @@ impl Transform
         self.size *= DVec2::new(x_factor, y_factor).max(DVec2::ZERO);
     }
 
-    #[expect(clippy::cast_possible_truncation, reason = "truncation will only happen at values where a problem will happen elsewhere first")]
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "truncation will only happen at values where a problem will happen elsewhere first"
+    )]
     pub fn mesh(&self) -> Mesh
     {
         Mesh::quad(

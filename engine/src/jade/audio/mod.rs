@@ -1,5 +1,6 @@
 use kira::{
-    manager::{AudioManager, AudioManagerSettings, DefaultBackend, backend::Backend, error::PlaySoundError}, sound::static_sound::{StaticSoundData, StaticSoundHandle, StaticSoundSettings},
+    manager::{AudioManager, AudioManagerSettings, DefaultBackend, backend::Backend, error::PlaySoundError},
+    sound::static_sound::{StaticSoundData, StaticSoundHandle, StaticSoundSettings},
 };
 use proc_macros::Resource;
 

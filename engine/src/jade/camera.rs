@@ -19,7 +19,7 @@ impl Camera
         }
     }
 
-    pub fn update_viewport(&mut self, dims: (f32, f32)) { self.viewport = dims.into()}
+    pub fn update_viewport(&mut self, dims: (f32, f32)) { self.viewport = dims.into() }
 
     pub fn set_zoom(&mut self, zoom: f32) -> f32
     {
