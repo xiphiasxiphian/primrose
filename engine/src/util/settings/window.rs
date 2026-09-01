@@ -1,9 +1,10 @@
 use color_eyre::eyre;
+use proc_macros::WithBuilder;
 use winit::{dpi::LogicalSize, window::{Fullscreen, Icon, WindowAttributes}};
 
 use crate::jade::input::key::Key;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, WithBuilder)]
 pub struct WindowDescriptor
 {
     pub title: &'static str,

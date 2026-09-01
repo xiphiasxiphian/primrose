@@ -73,9 +73,7 @@ fn main()
     env_logger::init();
     Window::run(
         Handler,
-        &WindowDescriptor {
-            title: "Primrose",
-            ..Default::default()
-        },
+        &WindowDescriptor::default()
+            .with_title("Primrose"),
     );
 }
