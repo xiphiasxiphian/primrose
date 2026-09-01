@@ -24,3 +24,4 @@ derive-new = "0.7.0"
 derive_more = { version = "2.1.1", features = ["full"] }
 proc-macros = { version = "0.1.0", path = "../proc-macros" }
 typeid = "1.0.3"
+color-eyre = "0.6.5"

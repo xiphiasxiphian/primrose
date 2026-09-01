@@ -1,4 +1,5 @@
-use winit::{dpi::LogicalSize, window::{Fullscreen, WindowAttributes}};
+use color_eyre::eyre;
+use winit::{dpi::LogicalSize, window::{Fullscreen, Icon, WindowAttributes}};
 
 use crate::jade::input::key::Key;
 
@@ -8,6 +9,7 @@ pub struct WindowDescriptor
     pub title: &'static str,
     pub dims: (u32, u32),
     pub fullscreen_options: Option<FullscreenOptions>,
+    pub icon: Option<&'static str>,
 }
 
 impl Default for WindowDescriptor
@@ -19,6 +21,7 @@ impl Default for WindowDescriptor
             title: "Default Title",
             dims,
             fullscreen_options: Some(FullscreenOptions::default()),
+            icon: None,
         }
     }
 }
@@ -30,6 +33,28 @@ impl WindowDescriptor
         self.fullscreen_options
             .and_then(|x| x.on_start.then_some(Fullscreen::Borderless(None)))
     }
+
+    pub fn load_icon(path: &str) -> eyre::Result<Icon>
+    {
+        let bytes = std::fs::read(path)?;
+
+        let (rgba, width, height) = {
+            let image = image::load_from_memory(&bytes)?.into_rgba8();
+            let (width, height) = image.dimensions();
+            let rgba = image.into_raw();
+            (rgba, width, height)
+        };
+
+        Ok(Icon::from_rgba(rgba, width, height)?)
+    }
+
+    pub fn get_icon(&self) -> Option<Icon>
+    {
+        self.icon.and_then(|path| WindowDescriptor::load_icon(path).map_or_else(|x| {
+                log::warn!("Failed to load icon at {}: {}", self.icon.unwrap_or("{unknown}"), x);
+                None
+            }, |x| Some(x)))
+    }
 }
 
 impl From<WindowDescriptor> for WindowAttributes
@@ -40,6 +65,7 @@ impl From<WindowDescriptor> for WindowAttributes
             .with_title(descriptor.title)
             .with_inner_size(LogicalSize::new(descriptor.dims.0, descriptor.dims.1))
             .with_fullscreen(descriptor.get_fullscreen())
+            .with_window_icon(descriptor.get_icon())
     }
 }
 
