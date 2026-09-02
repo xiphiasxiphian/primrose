@@ -19,7 +19,19 @@ pub fn derive_component(input: TokenStream) -> TokenStream
 
     let crate_base = match found_crate
     {
-        FoundCrate::Itself => quote!(crate),
+        FoundCrate::Itself =>
+        {
+            let compiling_crate_name = std::env::var("CARGO_CRATE_NAME").unwrap_or_default();
+
+            if compiling_crate_name == "engine"
+            {
+                quote!(crate)
+            }
+            else
+            {
+                quote!(::engine)
+            }
+        }
         FoundCrate::Name(name) =>
         {
             let ident = Ident::new(&name, Span::call_site());

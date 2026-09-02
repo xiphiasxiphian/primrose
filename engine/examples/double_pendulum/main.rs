@@ -29,10 +29,7 @@ impl WindowHandler for Handler
     where
         Self: Sized,
     {
-        [(
-            "grass",
-            ManagedResource::eager(&include_bytes!("../assets/images/grass.png")[..]),
-        )]
+        []
     }
 
     fn sounds() -> impl IntoIterator<Item = (&'static str, ManagedResource<&'static [u8]>)>
