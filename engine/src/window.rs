@@ -7,10 +7,9 @@ use wgpu::{
 };
 use winit::{
     application::ApplicationHandler,
-    dpi::LogicalSize,
     event::WindowEvent,
     event_loop::{ActiveEventLoop, EventLoop},
-    window::{Fullscreen, Window as NativeWindow, WindowAttributes, WindowId},
+    window::{Fullscreen, Window as NativeWindow, WindowId},
 };
 
 use crate::{

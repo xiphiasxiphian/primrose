@@ -5,7 +5,7 @@ use proc_macro::TokenStream;
 use proc_macro_crate::{FoundCrate, crate_name};
 use proc_macro2::Span;
 use quote::{format_ident, quote};
-use syn::{Data, DeriveInput, Fields, GenericArgument, Generics, Ident, PathArguments, Type, parse_macro_input};
+use syn::{DeriveInput, GenericArgument, Generics, Ident, PathArguments, Type, parse_macro_input};
 
 /// Derive the Component trait
 ///
@@ -19,19 +19,15 @@ pub fn derive_component(input: TokenStream) -> TokenStream
 
     let crate_base = match found_crate
     {
-        FoundCrate::Itself =>
-        {
+        FoundCrate::Itself => {
             let compiling_crate_name = std::env::var("CARGO_CRATE_NAME").unwrap_or_default();
 
-            if compiling_crate_name == "engine"
-            {
+            if compiling_crate_name == "engine" {
                 quote!(crate)
-            }
-            else
-            {
+            } else {
                 quote!(::engine)
             }
-        }
+        },
         FoundCrate::Name(name) =>
         {
             let ident = Ident::new(&name, Span::call_site());
@@ -60,7 +56,15 @@ pub fn derive_resource(input: TokenStream) -> TokenStream
 
     let crate_base = match found_crate
     {
-        FoundCrate::Itself => quote!(crate),
+        FoundCrate::Itself => {
+            let compiling_crate_name = std::env::var("CARGO_CRATE_NAME").unwrap_or_default();
+
+            if compiling_crate_name == "engine" {
+                quote!(crate)
+            } else {
+                quote!(::engine)
+            }
+        },
         FoundCrate::Name(name) =>
         {
             let ident = Ident::new(&name, Span::call_site());
